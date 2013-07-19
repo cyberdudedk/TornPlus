@@ -1,0 +1,275 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<style>
+#debug {
+    /*width:500px;*/
+}
+
+#categories:first-child {
+    border-top: 1px solid white;
+}
+
+#categories {
+    float:left;
+    width: 120px;
+    height: 400px;
+    border: 1px solid black;
+}
+
+#categories ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#categories li {
+    background-color: white;
+    color: red;
+    padding: 0;
+    margin: 0;
+    border: 1px solid black;
+}
+
+#categories li a {
+    padding-right: 120px;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+}
+
+#categories ul li.active {
+    background-color: gray;
+}
+
+#functions {
+    float: left;
+    width: 520px;
+    height: 400px;
+    border: 1px solid black;
+}
+
+#buttons {
+    float:right;
+    height: 30px;
+    /*border: 1px solid green;*/
+}
+
+.function {
+    border-bottom: 1px solid black;
+    padding: 5px;  
+}
+.function_enable {
+    /*border: 1px solid purple;*/
+    float: left;
+    width: 30px;
+    margin-right: 5px;
+}
+.function_name {
+    /*border: 1px solid gray;*/
+}
+.function_options {
+    /*border: 1px solid red;*/
+    margin-left: 40px;
+}
+.function_option {
+    /*border: 1px solid lime;*/
+}
+.function_option_name {
+    /*border: 1px solid cyan;*/
+    float:left;
+    width: 100px;
+}
+.function_option_value {
+    /*border: 1px solid black;*/
+}
+
+</style>
+<script>
+//TODO: Seperate Style, Javascript and HTML to 3 seperate files?
+
+var log;
+var moduleInfos = {};
+var sortedInfos = {};
+
+function crossriderMain($) {
+    
+    /* Debuggin to Debug select, since we can't debug to a firefox like window, in the popup
+        We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
+        So I temporarily added a visible debug "bar"
+         */
+    log = function(m) {
+        if(typeof(m) == 'object') m = m.toSource();
+        $debug = $('#debug');
+        console.log(m);
+        var $opt = $('<option>'+m+'</option>').appendTo($debug);
+        $debug.scrollTop($debug.scrollTop() + ($opt.offset().top - $debug.offset().top));
+    };
+
+    this.onerror = function(e){alert(e);};
+    
+    /* TODO: - Due to Crossrider currently not supporting resources.getFolderContent in popup scope
+              Registering all moduoles in popup scope is currently unsupported.
+              Also due to includeJS also currently not supported in popup scope, eval .get is needed as work-around when loading scripts.
+    */
+    
+    //eval(appAPI.resources.get('core/script.js'));
+    //Script.forceRegisterAll = true;
+    /* For some (unknown) reason, calling includeJS function outside appAPI.ready scope crashes it.*/
+    /* So this is a hack */
+    /*Script.loadModule = function(mod) {
+        appAPI.resources.includeJS('modules/'+mod+'.js'); //In background scope probably eval .get is needed, but hack might still apply
+        this.loadedModules[mod] = true;
+    }*/
+    
+    moduleInfos = appAPI.db.get('moduleInfos');
+    var options = appAPI.db.get('moduleOptions') || {};
+    var enabledFunc = options['enabled'] || {};
+    var funcOptions = options['options'] || {};
+        
+    for(var f in moduleInfos)
+    {
+        var mod = moduleInfos[f];
+        var cat = (mod.category || 'misc').toLowerCase();
+        if(typeof(sortedInfos[cat]) == 'undefined') sortedInfos[cat] = [];
+        mod.funcname = f;
+        sortedInfos[cat].push(mod);
+    }
+       
+    $cat = $('#categories ul');
+    for(var cat in sortedInfos) {
+        var c = cat.charAt(0).toUpperCase() + cat.slice(1); //Capitalizing first char
+        
+        $cat.append('<li><a href="#">'+c+'</a></li>');
+        var funcsDiv = $('#functions');
+        $funccat = $('<div class="funccategories" name="'+cat+'" style="display:none;"></div>').appendTo(funcsDiv);
+        
+        var funcs = sortedInfos[cat];
+        for(f in funcs) {
+            var func = funcs[f];
+           
+            $options = $('<div class="function_options">');
+            for(var i in (func.options || []))
+            {
+                var opt = func.options[i];
+                $options.append(
+                    $('<div class="function_option"></div>').append(
+                        $('<div class="function_option_name"></div>').append(opt.name),
+                        $('<div class="function_option_value"><input type="textbox" name="options['+func.funcname+']['+opt.name+']" value="'+(funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value)+'"/></div>')
+                    )
+                );    
+            }
+
+            $($funccat).append(
+                $('<div class="function"></div>').append(
+                        $('<div class="function_enable"><input type="checkbox" name="enabled['+func.funcname+']" value="1"'+(enabledFunc[func.funcname] || false ? 'checked="checked"':'')+'/></div>'),
+                        $('<div class="function_name">'+func.title+'</div>'),
+                        $options
+                    )
+            );
+        }
+    }
+    
+    $('#categories li a').click(function() {
+        $('.active').removeClass('active');
+        $(this).parent().addClass('active');
+        var cat = $(this).parent().text().toLowerCase();
+        $('#functions .funccategories').hide();
+        $('#functions .funccategories[name="'+cat+'"]').show();        
+    });
+    
+    $('#btnSave').click(function(){
+        var values = $('#values').serializeForm();
+        appAPI.db.set('moduleOptions',values);
+        appAPI.browserAction.closePopup();
+    });
+    
+    $('#btnCancel').click(function(){
+        appAPI.browserAction.closePopup();
+    });
+
+
+    /* TODO: Move to helpers.js, and include helpers.js */
+    /*
+    * serializeForm
+    * https://github.com/danheberden/serializeForm
+    *
+    * Copyright (c) 2012 Dan Heberden
+    * Licensed under the MIT, GPL licenses.
+    */
+    $.fn.serializeForm = function() {
+        if ( this.length < 1) { 
+            return false; 
+        }
+        var data = {};
+        var lookup = data; //current reference of data
+        var selector = ':input[type!="checkbox"][type!="radio"], input:checked';
+        var parse = function() {
+            var named = this.name.replace(/\[([^\]]+)?\]/g, ',$1').split(',');
+            var cap = named.length - 1;
+            var $el = $(this);
+            if ( named[ 0 ] ) {
+                for(var i = 0;i < cap;i++) {
+                    lookup = lookup[named[i]] = lookup[named[i]] || (named[i+1] === "" ? [] : {});
+                }
+                if ( lookup.length !==  undefined ) {
+                    lookup.push($el.val());
+                }else {
+                    lookup[named[cap]]  = $el.val();
+                }
+                lookup = data;
+            }
+        };
+        this.filter( selector ).each( parse );
+        this.find( selector ).each( parse );
+        return data;
+    };
+}
+
+</script>
+</head>
+
+<body>
+
+<div id="categories">
+    <ul>
+        
+    </ul>
+</div>
+<form id="values">
+<div id="functions">
+    <!-- //How the html will look like when generated, temporarily keeping here to show generated example
+    <div class="function">
+        <div class="function_enable"><input type="checkbox" name="FUNCNAME" value="1"/></div>
+        <div class="function_name">Grouping items together</div>
+        <div class="function_options">
+            <div class="function_option">
+                <div class="function_option_name">Var1</div>
+                <div class="function_option_value"><input type="textbox" name="OPTIONNAME" value="VALUE"/></div>
+            </div>
+            <div class="function_option">
+                <div class="function_option_name">Var2</div>
+                <div class="function_option_value">Test2</div>            
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+</form>
+
+<br style="clear: both;"/>
+
+<div id="buttons">
+<input type="button" id="btnSave" name="save" value="Save" />&nbsp;
+<input type="button" id="btnCancel"  name="cancel" value="Cancel" />
+</div>
+
+<div style="width: 500px;overflow-x: scroll;">
+<select id="debug" size="5"></select>
+</div>
+
+
+</body>
+
+</html>
