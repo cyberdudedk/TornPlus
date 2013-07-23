@@ -71,7 +71,7 @@ Helpers = {
             }
         }
         else {
-            if(new Date(valObj.timestamp) >= appAPI.time.now()) {
+            if(new Date(valObj.timestamp) >= appAPI.time.now() && forceset == false) {
                 value = valObj.value;
             }
             else {

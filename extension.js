@@ -6,21 +6,18 @@ TODO List
 - 
 */
 
-
-
-
 /* Due to Crossrider's getFolderContent function only seeing files in the crossrider project, 
     and not files added in local debug mode, use this devFiles array to add modules added in local debug mode.
     Should be cleared when Crossrider source is updated.
  */
-var devFiles = ["module3"];
+var devFiles = ["module3","dev"];
 
-/* Creating easy "shorthands" for some of the helper methods being used often, maybe not a good idea? */
+
 var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
     //return; //Disable
-    
+
     //Return/End script if not on a Torn page.
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
@@ -42,15 +39,16 @@ appAPI.ready(function(jq) {
     
     /* Loading an instance of the API with body as content */
     Torn = new TornAPI(document.body);
-    
+
     /* Creating easy "shorthands" for some of the helper methods being used often, maybe not a good idea? */
     cachedValue = Helpers.cachedValue;
     getPage = Helpers.getPage;
     getPageSync = Helpers.getPageSync;
     
     /* Use this to test collecting all cache from scratch */
-    //Script.clearCache(); 
-    
+    //Script.clearCache();
+    //Script.clearStorage();
+
     /* Use when debugging, will reregister all modules */
     Script.forceRegisterAll = true;
     
@@ -66,15 +64,17 @@ appAPI.ready(function(jq) {
 /***** Some debug functionality *********/
 
 /* Shorthand for debug */
+
 log = function(msg) {
     console.debug(msg);
+    //appAPI.debug(msg);
 }
 error = function(msg) {
     console.debug('Error: ' + msg);
 }
 
 /* In Firefox send debug info to Firebug console instead of Firefox Error Console (Ctrl+Shift+J) */
-if (appAPI.browser.name == "firefox") { 
+if (appAPI.browser.name == "firefox") {
   console = { 
     log: function(m) { 
         try { unsafeWindow.console.log(m); } 

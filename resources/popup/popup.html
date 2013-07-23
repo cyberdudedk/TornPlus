@@ -74,12 +74,13 @@
     margin-left: 40px;
 }
 .function_option {
+    width: 100%;
     /*border: 1px solid lime;*/
 }
 .function_option_name {
     /*border: 1px solid cyan;*/
     float:left;
-    width: 100px;
+    width: 150px;
 }
 .function_option_value {
     /*border: 1px solid black;*/
@@ -92,9 +93,9 @@
 var log;
 var moduleInfos = {};
 var sortedInfos = {};
-
-function crossriderMain($) {
-    
+var $;
+function crossriderMain(jq) {
+    $ = jq;
     /* Debuggin to Debug select, since we can't debug to a firefox like window, in the popup
         We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
         So I temporarily added a visible debug "bar"
@@ -103,10 +104,20 @@ function crossriderMain($) {
         if(typeof(m) == 'object') m = m.toSource();
         $debug = $('#debug');
         console.log(m);
-        var $opt = $('<option>'+m+'</option>').appendTo($debug);
+        var $opt = $('<option></option>').appendTo($debug);
+        $opt.text(m);
         $debug.scrollTop($debug.scrollTop() + ($opt.offset().top - $debug.offset().top));
     };
 
+    $('#debug').change(function(){
+        var str = '';
+        $("#debug option:selected").each(function () {
+            str += $(this).text() + " ";
+        });
+        $("#debugtxt").text(str);
+    });
+
+    //log(appAPI);
     this.onerror = function(e){alert(e);};
     
     /* TODO: - Due to Crossrider currently not supporting resources.getFolderContent in popup scope
@@ -127,7 +138,6 @@ function crossriderMain($) {
     var options = appAPI.db.get('moduleOptions') || {};
     var enabledFunc = options['enabled'] || {};
     var funcOptions = options['options'] || {};
-        
     for(var f in moduleInfos)
     {
         var mod = moduleInfos[f];
@@ -136,7 +146,33 @@ function crossriderMain($) {
         mod.funcname = f;
         sortedInfos[cat].push(mod);
     }
-       
+
+    var generateValue = function(name,value,opt) {
+        var obj = "" + value;
+        switch(opt.type) {
+            case 'boolean':
+                obj = $('<input type="checkbox">').attr('name',name).val(1).prop('checked', value);
+            break;
+
+            case 'string':
+                obj = $('<input type="text">').attr('name',name).val(value);
+            break;
+
+            case 'int':
+                obj = $('<input type="text">').attr('name',name).val(value).on('keyup', function () {
+                    this.value = this.value.replace(/[^0-9]/gi, '');
+                });
+            break;
+
+            default:
+                log(name + ' : ' + opt.type + ' = ' + value);
+            break;
+
+        }
+        return obj;
+    }
+
+
     $cat = $('#categories ul');
     for(var cat in sortedInfos) {
         var c = cat.charAt(0).toUpperCase() + cat.slice(1); //Capitalizing first char
@@ -156,7 +192,8 @@ function crossriderMain($) {
                 $options.append(
                     $('<div class="function_option"></div>').append(
                         $('<div class="function_option_name"></div>').append(opt.name),
-                        $('<div class="function_option_value"><input type="textbox" name="options['+func.funcname+']['+opt.name+']" value="'+(funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value)+'"/></div>')
+                        //$('<div class="function_option_value"><input type="textbox" name="options['+func.funcname+']['+opt.name+']" value="'+(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value)+'"/></div>')
+                        $('<div class="function_option_value"></div>').append(generateValue('options['+func.funcname+']['+opt.name+']',(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value), opt))
                     )
                 );    
             }
@@ -267,6 +304,7 @@ function crossriderMain($) {
 
 <div style="width: 500px;overflow-x: scroll;">
 <select id="debug" size="5"></select>
+    <textarea id="debugtxt"></textarea>
 </div>
 
 

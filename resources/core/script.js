@@ -89,7 +89,6 @@ Script = {
                         if(this.modulePages[page] == undefined) this.modulePages[page] = [];
                         this.modulePages[page].push(funcName);    
                     }
-                    
                     var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':func._options};
                     this.moduleInfos[funcName] = obj;
                     
@@ -124,5 +123,78 @@ Script = {
     },
     clearStorage: function () {
         appAPI.db.removeAll();
+    },
+
+
+
+
+
+    Dev: {
+        devPath: null,
+        setPath: function(path) {
+            Script.Dev.devPath = path;
+            appAPI.internal.db.set('debug_path',path);
+            appAPI.internal.db.set('debug_resources_path',path + 'resources/');
+            if(Script.Dev.getDebugMode())
+                Script.Dev.setDebugMode(true);
+        },
+        getPath: function(path) {
+            return appAPI.internal.db.get('debug_path');
+        },
+        setDebugMode: function(value) {
+            if(typeof(value) == 'undefined') value = true;
+            if(value) {
+                log(Script.Dev.devPath);
+                if(typeof(Script.Dev.devPath) == 'undefined')
+                {
+                    log('setting debug mode using debugurl');
+                    appAPI.internal.debug.turnOn(appAPI.internal.debug.getDebugUrl());
+                }
+                else
+                {
+                       log('setting debug mode using custom');
+                    appAPI.internal.debug.turnOn({userCode:Script.Dev.devPath + "extension.js", backgroundCode:Script.Dev.devPath + "background.js"});
+                }
+            }
+            else {
+                appAPI.internal.debug.turnOff();
+            }
+        },
+        getDebugMode: function() {
+            return appAPI.internal.debug.isDebugMode();
+        },
+        loadBackground: function() {
+            appAPI.internal.reloadBackground();
+        },
+        stubExtensionAPI: function() {
+            log(appAPI);
+            var stub = {};
+            /*for(var id in appAPI) {
+                log(id + ' : ' + typeof(appAPI[id]));
+                stub[id] = Script.Dev.stubAPIRec(id,appAPI[id]);
+            }*/
+            stub = Script.Dev.stubAPIRec(appAPI);
+
+            log(stub.toSource());
+        },
+        stubAPIRec: function(obj) {
+            var temp = {};
+            for(var id in obj) {
+                //log(id + ' : ' + typeof(obj[id]));
+                var type = typeof(obj[id]);
+                if(type == 'function') {
+                    temp[id] = function() {}; //'test';//Script.Dev.stubAPIRec(id,appAPI[id]);
+                } else if(type == 'object') {
+                    temp[id] = Script.Dev.stubAPIRec(obj[id]);
+                } else {
+                    //log('Unknown: ' + id + ' : ' + typeof(obj[id]));
+                    temp[id] = null;
+                }
+
+
+            }
+            return temp;
+
+        }
     }
 }
