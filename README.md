@@ -15,7 +15,32 @@ Hop on to [#TornPlus at irc.torn.com](irc://irc.torn.com:6667/TornPlus)
 Early development status
 
 ## Contribute
-Hop on to IRC chan to get information on how to setup for development.
+Hop on to IRC chan to discuss early development structure, code standards, concepts, etc.  
+* Download TornPlus-staging at [TornPlus crossrider download](http://crossrider.com/download/38039) the link is Browser aware
+
+If you don't want to use browser aware download link here they are for each of the main browsers (Safari support will come later)
+[Firefox](http://crossrider.com/download/ff/38039)
+[IE](http://crossrider.com/download/ie/38039)
+[Chrome](http://crossrider.com/download/chrome/38039)
+
+For Chrome, the download is downloaded to your download folder, Drag the file into your Settings->Extensions to install.
+
+* When installed restart if nescesary.
+* The extension is now running in Staging mode.
+* Use Git, ([Github for windows] (http://windows.github.com/) is recommended for simplicity), although use whatever Git program you want.
+* Fork the TornPlus project, and download the source.
+* Setup a localhost webserver (IIS or Apache) if you don't already have.
+* Setup a website pointing to the TornPlus source , e.g http://localhost/tornplus
+* In your browser, click the Torn Plus browser button, which opens the settings screen.
+* Go to the Dev menu, and enable Developer Mode and localwebdev, input your localhost path.
+* Save
+* Refresh Torn page.
+* You are now running the from local source
+
+* Commit often, and perform pull request when you need to.
+* Contributions will be reviewed before accepted.
+
+* Trusted and committed project members might get access to push commits directly to master.
 
 ## Crossrider resources
 [Crossrider](http://www.crossrider.com)  
