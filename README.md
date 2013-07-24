@@ -36,7 +36,6 @@ For Chrome, the download is downloaded to your download folder, Drag the file in
 * Save
 * Refresh Torn page.
 * You are now running the from local source
-
 * Commit often, and perform pull request when you need to.
 * Contributions will be reviewed before accepted.
 * Trusted and committed project members might get access to push commits directly to master.
