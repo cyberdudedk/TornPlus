@@ -18,10 +18,10 @@ Early development status
 Hop on to IRC chan to discuss early development structure, code standards, concepts, etc.  
 * Download TornPlus-staging at [TornPlus crossrider download](http://crossrider.com/download/38039) the link is Browser aware
 
-If you don't want to use browser aware download link here they are for each of the main browsers (Safari support will come later)
-[Firefox](http://crossrider.com/download/ff/38039)
-[IE](http://crossrider.com/download/ie/38039)
-[Chrome](http://crossrider.com/download/chrome/38039)
+If you don't want to use browser aware download link here they are for each of the main browsers (Safari support will come later)  
+[Firefox](http://crossrider.com/download/ff/38039)  
+[IE](http://crossrider.com/download/ie/38039)  
+[Chrome](http://crossrider.com/download/chrome/38039)  
 
 For Chrome, the download is downloaded to your download folder, Drag the file into your Settings->Extensions to install.
 
