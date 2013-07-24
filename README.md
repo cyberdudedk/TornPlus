@@ -32,7 +32,7 @@ For Chrome, the download is downloaded to your download folder, Drag the file in
 * Setup a localhost webserver (IIS or Apache) if you don't already have.
 * Setup a website pointing to the TornPlus source , e.g http://localhost/tornplus
 * In your browser, click the Torn Plus browser button, which opens the settings screen.
-* Go to the Dev menu, and enable Developer Mode and localwebdev, input your localhost path.
+* Go to the Dev menu, and enable Developer Mode and localwebdev, input your localhost path. (**Note: Important you input correct path, inputting wrong path that you can't put your code at, will halt the function of the extension, and you'll most likely have to reinstall)**
 * Save
 * Refresh Torn page.
 * You are now running the from local source
