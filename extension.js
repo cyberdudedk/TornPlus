@@ -10,7 +10,7 @@ TODO List
     and not files added in local debug mode, use this devFiles array to add modules added in local debug mode.
     Should be cleared when Crossrider source is updated.
  */
-var devFiles = ["module3","dev"];
+var devFiles = []; //["module3","dev"];
 
 
 var $, Torn, cachedValue, getPage, getPageSync;
