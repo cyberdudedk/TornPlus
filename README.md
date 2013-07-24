@@ -39,7 +39,6 @@ For Chrome, the download is downloaded to your download folder, Drag the file in
 
 * Commit often, and perform pull request when you need to.
 * Contributions will be reviewed before accepted.
-
 * Trusted and committed project members might get access to push commits directly to master.
 
 ## Crossrider resources
