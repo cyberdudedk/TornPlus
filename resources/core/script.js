@@ -132,6 +132,7 @@ Script = {
     Dev: {
         devPath: null,
         setPath: function(path) {
+            if(!Utils.endsWith(path,"/")) path += "/";
             Script.Dev.devPath = path;
             appAPI.internal.db.set('debug_path',path);
             appAPI.internal.db.set('debug_resources_path',path + 'resources/');
@@ -144,17 +145,10 @@ Script = {
         setDebugMode: function(value) {
             if(typeof(value) == 'undefined') value = true;
             if(value) {
-                log(Script.Dev.devPath);
                 if(typeof(Script.Dev.devPath) == 'undefined')
-                {
-                    log('setting debug mode using debugurl');
                     appAPI.internal.debug.turnOn(appAPI.internal.debug.getDebugUrl());
-                }
                 else
-                {
-                       log('setting debug mode using custom');
                     appAPI.internal.debug.turnOn({userCode:Script.Dev.devPath + "extension.js", backgroundCode:Script.Dev.devPath + "background.js"});
-                }
             }
             else {
                 appAPI.internal.debug.turnOff();
@@ -166,35 +160,27 @@ Script = {
         loadBackground: function() {
             appAPI.internal.reloadBackground();
         },
+        update: function() {
+            appAPI.internal.forceUpdate();
+        },
         stubExtensionAPI: function() {
-            log(appAPI);
             var stub = {};
-            /*for(var id in appAPI) {
-                log(id + ' : ' + typeof(appAPI[id]));
-                stub[id] = Script.Dev.stubAPIRec(id,appAPI[id]);
-            }*/
             stub = Script.Dev.stubAPIRec(appAPI);
-
             log(stub.toSource());
         },
         stubAPIRec: function(obj) {
             var temp = {};
             for(var id in obj) {
-                //log(id + ' : ' + typeof(obj[id]));
                 var type = typeof(obj[id]);
                 if(type == 'function') {
-                    temp[id] = function() {}; //'test';//Script.Dev.stubAPIRec(id,appAPI[id]);
+                    temp[id] = function() {};
                 } else if(type == 'object') {
                     temp[id] = Script.Dev.stubAPIRec(obj[id]);
                 } else {
-                    //log('Unknown: ' + id + ' : ' + typeof(obj[id]));
                     temp[id] = null;
                 }
-
-
             }
             return temp;
-
         }
     }
 }

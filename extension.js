@@ -16,9 +16,9 @@ var devFiles = ["module3","dev"];
 var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
-    //return; //Disable
+    //return; /* Disable */
 
-    //Return/End script if not on a Torn page.
+    /* Return/End script if not on a Torn page. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
     
@@ -49,7 +49,7 @@ appAPI.ready(function(jq) {
     //Script.clearCache();
     //Script.clearStorage();
 
-    /* Use when debugging, will reregister all modules */
+    /* Use when debugging, will reregister all modules on each pageview */
     Script.forceRegisterAll = true;
     
     /* RUN FOREST RUN!!! */ 
@@ -67,7 +67,6 @@ appAPI.ready(function(jq) {
 
 log = function(msg) {
     console.debug(msg);
-    //appAPI.debug(msg);
 }
 error = function(msg) {
     console.debug('Error: ' + msg);

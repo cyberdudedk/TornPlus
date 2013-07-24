@@ -37,7 +37,11 @@ Utils = {
         $html = $(html);
         $html.find('img').attr('src','');
         return $html;
+    },
+    endsWith: function(str,suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
+
 };
 
 

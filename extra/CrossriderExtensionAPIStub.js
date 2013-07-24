@@ -1,3 +1,5 @@
+/* This is a stub of Crossrider's appAPI, this is not for testing, as all functionality is emtpy. It is solely for IDE's IntelliSense purpose */
+
 appAPI = ({
     JSON: {},
     debug: (function () {}),
