@@ -9,7 +9,7 @@ To create a new type of "userscript" like experience for Torn players. With a wh
 The Code is modular in the sense that all functionality is written in modules, utilizing a base core.
 
 ## IRC
-Hop on to [#TornPlus at irc.torn.com](irc://irc.torn.com:6667/TornPlus)
+Hop on to #TornPlus at irc.torn.com ( irc://irc.torn.com:6667/TornPlus )
 
 ## Current Status
 Early development status
