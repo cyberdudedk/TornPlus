@@ -6,6 +6,7 @@ Script = {
     loadedModules: {},
     modulePages: {},
     moduleInfos: {},
+    tempValues: {},
     /* For unknown reasons creating this here, outside of appAPI.ready crashes        
     loadModule: function(mod){
         appAPI.resources.includeJS('modules/'+mod+'.js');
@@ -35,7 +36,7 @@ Script = {
     },
     
     run: function(){
-        var options = appAPI.db.get('moduleOptions') || {};
+        var options = Script.getValue('moduleOptions') || {};
         var enabledFunc = options['enabled'] || {};
         var funcOptions = options['options'] || {};
         
@@ -124,6 +125,63 @@ Script = {
     clearStorage: function () {
         appAPI.db.removeAll();
     },
+    setValue: function(key,value,toTemp) {
+        if(typeof(toTemp) == 'undefined') toTemp = false;
+        if(toTemp == true) {
+            Script.tempValues[Script.userId() +'/'+key] = value;
+        } else {
+            appAPI.db.set(Script.userId()+'/'+key,value)
+        }
+    },
+    getValue: function(key,fromTemp) {
+        if(typeof(fromTemp) == 'undefined') fromTemp = false;
+        if(fromTemp == true) {
+            return Script.tempValues[Script.userId() +'/'+key];
+        } else {
+            return appAPI.db.get(Script.userId()+'/'+key);
+        }
+
+    },
+    _userid: null,
+    _username: null,
+    getUser: function() {
+        var obj = $('#headerUtils.fright #headerLinks .profilelink a.invert',Torn.ui.banner());
+        if(obj.size()==0)
+            obj = $('a[href^="profiles.php?XID="]',Torn.ui.navigation.info());
+        var id = Utils.number(obj.attr('href'));
+        var name = obj.text().split(' [')[0];
+        if(id != null)
+        {
+            Script._username = name;
+
+            Script._userid = id;
+
+            var users = Script.getRegisteredIds();
+
+            //if(typeof(users[id]) == 'undefined')
+            //{
+                users[id] = name;
+                appAPI.db.set('users',users);
+            //}
+        }
+        return id;
+    },
+    userId: function() {
+        return Script._userid;
+    },
+    userName: function() {
+        return Script._username;
+    },
+    getRegisteredIds: function () {
+        return appAPI.db.get('users') || {};
+    },
+    setUserId: function(id) {
+        Script._userid = id;
+        var ids = Script.getRegisteredIds();
+        if(typeof(ids[id]) != 'undefined') {
+            Script._username = ids[id];
+        }
+    },
 
 
 
@@ -184,3 +242,5 @@ Script = {
         }
     }
 }
+
+

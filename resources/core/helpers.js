@@ -2,6 +2,7 @@
 /* Utils contains general Javascript functions usable several places */
 Utils = {
     number: function(str) {
+        if(str == undefined) return undefined;
         return str.replace(/[^\d]/g,''); //Remove any non-number char.
     },
     querystringToObject: function(query) {
@@ -55,11 +56,12 @@ Helpers = {
     cachedValue: function(key,func,TTL, forceset) {
         if(typeof(forceset) == 'undefined') forceset = false;
         var t, value;
-        var valObj = appAPI.db.get('cache/' + key);
+        //var valObj = appAPI.db.get('cache/' + key);
+
     
         switch(TTL)
         {
-            case 0: t = appAPI.time.secondsFromNow(10); break;
+            case 0: t = null; break;
             case 1: t = appAPI.time.minutesFromNow(10); break;
             case 2: t = appAPI.time.hoursFromNow(1); break;
             case 3: t = appAPI.time.hoursFromNow(24); break;
@@ -67,11 +69,15 @@ Helpers = {
             case 5: t = appAPI.time.daysFromNow(7); break;
             default: t = appAPI.time.hoursFromNow(24);
         }
+
+        var valObj = Script.getValue('cache/' + key,t == null);
+
         if(valObj == undefined)
         {
             value = func();
             if(value != undefined) {
-                appAPI.db.set('cache/' + key,{value:value,timestamp:t});
+                    Script.setValue('cache/' + key,{value:value,timestamp:t},t==null);
+                //appAPI.db.set();
             }
         }
         else {
@@ -81,7 +87,8 @@ Helpers = {
             else {
                 value = func();
                 if(value != undefined) {
-                    appAPI.db.set('cache/' + key,{value:value,timestamp:t});
+                    Script.setValue('cache/' + key,{value:value,timestamp:t},t==null);
+                    //appAPI.db.set('cache/' + key,{value:value,timestamp:t});
                 } else {
                     value = valObj.value;
                 }

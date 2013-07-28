@@ -4,6 +4,18 @@
 TornAPI = function(p) {
     var page = jQuery(p);
     var self = this;
+    this.style = {
+        isOld: function() {
+            return true; //Detection needed
+        },
+        isMobile: function() {
+            return false; //Detection needed
+        },
+        isRespo: function() {
+            return false; //Detection needed when Respo is released
+        }
+    }
+
     this.ui = {
         navigation: {
             account: function() {
@@ -16,8 +28,11 @@ TornAPI = function(p) {
                 return $('#mainNavigation #nav-g5');
             },
             info: function() {
-                return $('#mainNavigation #nav-g1');
+                return $('#player-stats'); //$('#mainNavigation #nav-g1');
             }
+        },
+        banner: function() {
+            return $('#banner');
         },
         content: function(){
             return $('> div > table:not(#announce) > tbody > tr > td:last',page).contents().filter(function(){return this.nodeType == 1 || (this.nodeType == 3 && this.textContent.trim() != '');});
@@ -26,14 +41,10 @@ TornAPI = function(p) {
     
     this.user = {
         id: function() {
-            return cachedValue('user/id',function() {
-                return Utils.number($('#tblInfo a[href^="profiles.php?XID="]',self.ui.navigation.info()).attr('href')); 
-            });
+            return Script.userId();
         },
         name: function() {
-            return cachedValue('user/name',function() {
-                return $('#tblInfo a[href^="profiles.php?XID="]',self.ui.navigation.info()).text(); 
-            });
+            return Script.userName();
         },
         profile: function() {
             return cachedValue('user/profile',function() {
@@ -78,7 +89,7 @@ TornAPI = function(p) {
                 if(educontainer.size()>0) edus = {};
                 educontainer.each(function() {
                     var prog = $('.eduProgress .eduNumber',this).text().split(' / ');
-                    edus[$('.eduTitle',this).text()] = {num:Number(prog[0]), max:Number(prog[1])};
+                    edus[$('.eduTitle',this).text().toLowerCase()] = {num:Number(prog[0]), max:Number(prog[1])};
                 });
                 return edus;
             });

@@ -2,7 +2,7 @@ this.module1 = {
     allpages: new Func('Allpages',
         function(){
             log('All pages: ' + this.var1 + " = " + this.var2);
-            //log(Torn.user.id() + " : " + Torn.user.name());
+            log(Torn.user.id() + " : " + Torn.user.name());
             //log(Torn.user.profile());
             //log(Torn.user.faction());
             //log(Torn.user.factionId());

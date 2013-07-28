@@ -10,18 +10,18 @@ TODO List
     and not files added in local debug mode, use this devFiles array to add modules added in local debug mode.
     Should be cleared when Crossrider source is updated.
  */
-var devFiles = []; //["module3","dev"];
+var devFiles = [];//["module3","dev"];
 
 
 var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
+
     //return; /* Disable */
 
     /* Return/End script if not on a Torn page. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
-    
     $ = jq;
     this.onerror = function(e){error(e);};
 
@@ -36,7 +36,17 @@ appAPI.ready(function(jq) {
         appAPI.resources.includeJS('modules/'+mod+'.js');
         this.loadedModules[mod] = true;
     }
-    
+
+    /* Message listner for communication with background and popup scope */
+    appAPI.message.addListener(function(msg){
+        switch(msg.action) {
+            case 'getUserId':
+                appAPI.message.toPopup({action:'giveUserId',id:Script.getUser()});
+            break;
+        }
+    });
+
+
     /* Loading an instance of the API with body as content */
     Torn = new TornAPI(document.body);
 
@@ -44,16 +54,21 @@ appAPI.ready(function(jq) {
     cachedValue = Helpers.cachedValue;
     getPage = Helpers.getPage;
     getPageSync = Helpers.getPageSync;
-    
+
     /* Use this to test collecting all cache from scratch */
     //Script.clearCache();
     //Script.clearStorage();
 
     /* Use when debugging, will reregister all modules on each pageview */
     Script.forceRegisterAll = true;
-    
-    /* RUN FOREST RUN!!! */ 
-    Script.run();
+
+    var id = Script.getUser();
+
+    //Only run when we can get the user id 
+    if(id != null) {
+        /* RUN FOREST RUN!!! */
+        Script.run();
+    }
 });
 
 

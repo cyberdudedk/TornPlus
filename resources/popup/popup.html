@@ -94,13 +94,25 @@ var log;
 var moduleInfos = {};
 var sortedInfos = {};
 var $;
+
+
 function crossriderMain(jq) {
+    /* Message listener to communicate with extension scope */
+    appAPI.message.addListener(function(msg){
+        switch(msg.action) {
+            case 'giveUserId':
+                continueLoad(msg.id);
+            break;
+        }
+    });
+
     $ = jq;
-    /* Debuggin to Debug select, since we can't debug to a firefox like window, in the popup
+    /* Debugging to Debug select, since we can't debug to a firefox like window, in the popup
         We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
         So I temporarily added a visible debug "bar"
          */
     log = function(m) {
+        if(m == null) m = 'null';
         if(typeof(m) == 'object') m = m.toSource();
         $debug = $('#debug');
         console.log(m);
@@ -116,26 +128,31 @@ function crossriderMain(jq) {
         });
         $("#debugtxt").text(str);
     });
+    //this.onerror = function(e){alert(e);};
 
-    //log(appAPI);
-    this.onerror = function(e){alert(e);};
-    
-    /* TODO: - Due to Crossrider currently not supporting resources.getFolderContent in popup scope
-              Registering all moduoles in popup scope is currently unsupported.
-              Also due to includeJS also currently not supported in popup scope, eval .get is needed as work-around when loading scripts.
-    */
-    
-    //eval(appAPI.resources.get('core/script.js'));
-    //Script.forceRegisterAll = true;
+    appAPI.message.toActiveTab({action:'getUserId',from:'popup'});
+}
+
+var continueLoad = function(id) {
+    if(id == null) {
+        $('#status').text('Login to Torn and try again');
+        return;
+    }
+    $('#content').show();
+    eval(appAPI.resources.get('core/script.js'));
+    Script.setUserId(id);
+    $('#status').text('Loaded profile for user: ' + Script.userName() + ' [' + Script.userId() + ']');
+
     /* For some (unknown) reason, calling includeJS function outside appAPI.ready scope crashes it.*/
     /* So this is a hack */
-    /*Script.loadModule = function(mod) {
+    Script.loadModule = function(mod) {
         appAPI.resources.includeJS('modules/'+mod+'.js'); //In background scope probably eval .get is needed, but hack might still apply
         this.loadedModules[mod] = true;
-    }*/
-    
+    }
+
     moduleInfos = appAPI.db.get('moduleInfos');
-    var options = appAPI.db.get('moduleOptions') || {};
+    var options = Script.getValue('moduleOptions') || {};
+
     var enabledFunc = options['enabled'] || {};
     var funcOptions = options['options'] || {};
     for(var f in moduleInfos)
@@ -171,7 +188,6 @@ function crossriderMain(jq) {
         }
         return obj;
     }
-
 
     $cat = $('#categories ul');
     for(var cat in sortedInfos) {
@@ -218,7 +234,7 @@ function crossriderMain(jq) {
     
     $('#btnSave').click(function(){
         var values = $('#values').serializeForm();
-        appAPI.db.set('moduleOptions',values);
+        Script.setValue('moduleOptions',values);
         appAPI.browserAction.closePopup();
     });
     
@@ -268,7 +284,8 @@ function crossriderMain(jq) {
 </head>
 
 <body>
-
+<div id="status">Loading, Ensure you are logged in to Torn and Torn is your current tab</div>
+<div id="content" style="display:none">
 <div id="categories">
     <ul>
         
@@ -306,7 +323,7 @@ function crossriderMain(jq) {
 <select id="debug" size="5"></select>
     <textarea id="debugtxt"></textarea>
 </div>
-
+</div>
 
 </body>
 
