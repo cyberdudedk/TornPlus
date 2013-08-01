@@ -5,7 +5,7 @@ var travelDatalist = {
             standard: 26,
             airstrip: 18,
             wlt: 13,
-            buisness: 8
+            business: 8
         }
     },
     'cayman islands': {
@@ -14,7 +14,7 @@ var travelDatalist = {
             standard: 35,
             airstrip: 26,
             wlt: 18,
-            buisness: 11
+            business: 11
         }
     },
     'canada': {
@@ -23,7 +23,7 @@ var travelDatalist = {
             standard: 41,
             airstrip: 29,
             wlt: 20,
-            buisness: 12
+            business: 12
         }
     },
     'hawaii': {
@@ -32,7 +32,7 @@ var travelDatalist = {
             standard: 134,
             airstrip: 94,
             wlt: 67,
-            buisness: 50
+            business: 50
         }
     },
     'united kingdom': {
@@ -41,7 +41,7 @@ var travelDatalist = {
             standard: 159,
             airstrip: 111,
             wlt: 80,
-            buisness: 48
+            business: 48
         }
     },
     'argentina': {
@@ -50,7 +50,7 @@ var travelDatalist = {
             standard: 167,
             airstrip: 117,
             wlt: 83,
-            buisness: 50
+            business: 50
         }
     },
     'switzerland': {
@@ -59,7 +59,7 @@ var travelDatalist = {
             standard: 175,
             airstrip: 123,
             wlt: 88,
-            buisness: 53
+            business: 53
         }
     },
     'japan': {
@@ -68,7 +68,7 @@ var travelDatalist = {
             standard: 225,
             airstrip: 158,
             wlt: 113,
-            buisness: 68
+            business: 68
         }
     },
     'china': {
@@ -77,7 +77,7 @@ var travelDatalist = {
             standard: 242,
             airstrip: 169,
             wlt: 121,
-            buisness: 72
+            business: 72
         }
     },
     'united arab emirates': {
@@ -86,7 +86,7 @@ var travelDatalist = {
             standard: 271,
             airstrip: 190,
             wlt: 135,
-            buisness: 81
+            business: 81
         }
     },
     'south africa': {
@@ -95,7 +95,7 @@ var travelDatalist = {
             standard: 297,
             airstrip: 208,
             wlt: 149,
-            buisness: 89
+            business: 89
         }
     }
 }
