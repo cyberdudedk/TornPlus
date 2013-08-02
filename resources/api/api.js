@@ -6,7 +6,7 @@ TornAPI = function(p) {
     var self = this;
     this.style = {
         isOld: function() {
-            return true; //Detection needed
+            return false; //Detection needed
         },
         isMobile: function() {
             return false; //Detection needed
@@ -14,7 +14,7 @@ TornAPI = function(p) {
         isRespo: function() {
             return false; //Detection needed when Respo is released
         }
-    }
+    } 
 
     this.ui = {
         navigation: {
@@ -75,12 +75,47 @@ TornAPI = function(p) {
                 return values;
             });
         },
-        faction: function() {
-            return self.user.profile().faction;
+
+        status: {
+            isInJail: function() {
+
+            },
+            isInHospital: function() {
+
+            },
+            isTraveling: function() {
+
+            },
+            isFlying: function() {
+
+            },
+            isLanded: function() {
+
+            },
+            inCountry: {
+                mexico: function() {
+                    return (self.user.status.isTraveling() ? false : self.user.status.isInWhichCountry() == 'mexico');
+                }
+            },
+            isInWhichCountry: function() {
+
+            }
         },
-        factionId: function() {
-            return self.user.faction().id;
+
+
+
+        faction: {
+            info: function() {
+                return self.user.profile().faction;
+            },
+            id: function() {
+                return self.user.faction.info().id;
+            },
+            isInFaction: function() {
+                return self.user.faction.info != undefined;
+            }
         },
+
         education: function() {
             return cachedValue('user/education',function() {
                 var page = getPageSync('education.php');
@@ -93,9 +128,152 @@ TornAPI = function(p) {
                 });
                 return edus;
             });
+        },
+
+        perks: {
+            all: function() {
+
+            },
+            education: function() {
+
+            },
+            job: function() {
+
+            },
+            company: function() {
+
+            },
+            faction: function() {
+
+            },
+            byEffect: {
+                nerve: function() {
+
+                },
+                education: function() {
+
+                },
+                addiction: function() {
+
+                },
+                hospital: function() {
+
+                }
+                /* TODO: More perks */
+
+
+            }
+        },
+
+        job: {
+            isInJob: function() {
+
+            },
+            jobType: function() {
+
+            },
+            company: function() {
+
+            },
+            rank: function() {
+
+            },
+            specials: function() {
+
+            },
+            gains: function() {
+
+            }
+
+        },
+
+
+        property: {
+            owned: function() {
+
+            },
+            information: function() {
+
+            }
+        },
+
+
+        stats: {
+            working: function() {
+
+            },
+            battle: function() {
+
+            },
+            detailed: function() {
+
+            },
+            racing: function() {
+
+            },
+            gym: function() {
+
+            },
+            poker: function() {
+
+            },
+            roulette: function() {
+
+            },
+            faction: function() {
+
+            },
+            recruit: function() {
+
+            }
+        },
+
+
+
+        unlockables: {
+            hasBazaar: function() {
+
+            },
+            hasDisplayCase: function() {
+
+            },
+            hasRacing: function() {
+
+            },
+            hasStockTicker: function() {
+
+            },
+            hasMuseum: function() {
+
+            },
+            hasSports: function() {
+
+            },
+            /* Are these needed? */
+            hasNotebook: function() {
+                return self.user.donator.isDonator();
+            },
+            hasFriendslist: function() {
+                return self.user.donator.isDonator();
+            },
+            hasBlacklist: function() {
+                return self.user.donator.isDonator();
+            }
+        },
+
+        donator: {
+            isDonator: function() {
+
+            },
+            isSubscriber: function() {
+
+            },
+            days: function() {
+
+            }
+
         }
-        
-        
+
     };
     
     this.pagecontent = function(){
