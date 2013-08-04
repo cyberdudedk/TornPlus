@@ -3,7 +3,7 @@
 Utils = {
     number: function(str) {
         if(str == undefined) return undefined;
-        return str.replace(/[^\d]/g,''); //Remove any non-number char.
+        return Number(str.match(/^[\s\S]*?\$?(([\d]*?,?)*[\d]*?[.]?[\d]+)[^\d]*?$/m)[1].replace(/,/g,'')); //Extract integer or float value
     },
     querystringToObject: function(query) {
         if (query == '' || typeof(query) == 'undefined') return {};
@@ -56,9 +56,7 @@ Helpers = {
     cachedValue: function(key,func,TTL, forceset) {
         if(typeof(forceset) == 'undefined') forceset = false;
         var t, value;
-        //var valObj = appAPI.db.get('cache/' + key);
 
-    
         switch(TTL)
         {
             case 0: t = null; break;
@@ -76,8 +74,7 @@ Helpers = {
         {
             value = func();
             if(value != undefined) {
-                    Script.setValue('cache/' + key,{value:value,timestamp:t},t==null);
-                //appAPI.db.set();
+                Script.setValue('cache/' + key,{value:value,timestamp:t},t==null);
             }
         }
         else {
@@ -88,7 +85,6 @@ Helpers = {
                 value = func();
                 if(value != undefined) {
                     Script.setValue('cache/' + key,{value:value,timestamp:t},t==null);
-                    //appAPI.db.set('cache/' + key,{value:value,timestamp:t});
                 } else {
                     value = valObj.value;
                 }
@@ -105,8 +101,13 @@ Helpers = {
         }});
     },
     /* XHR data from URL Sync, pass it through TornAPI, and return the API */
-    getPageSync: function (url) {
+    getPageSync: function (url, queryObject) {
         var page;
+        if(url.match(/.*?\.php/) == null)
+            url += ".php";
+        if(queryObject != undefined)
+            url = url + (url.match(/\?/) == null ? '?' : '&') + $.param(queryObject);
+        
         $.ajax({url:url,async:false,success:function(data){
             page = new TornAPI(Utils.getCleanHtml(data));
         }});

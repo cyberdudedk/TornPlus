@@ -6,7 +6,7 @@ TornAPI = function(p) {
     var self = this;
     this.style = {
         isOld: function() {
-            return false; //Detection needed
+            return $('#banner').size() == 0;
         },
         isMobile: function() {
             return false; //Detection needed
@@ -36,6 +36,52 @@ TornAPI = function(p) {
         },
         content: function(){
             return $('> div > table:not(#announce) > tbody > tr > td:last',page).contents().filter(function(){return this.nodeType == 1 || (this.nodeType == 3 && this.textContent.trim() != '');});
+        },
+
+        pageContent: {
+            home: {
+                getBoxes: function() {
+                    var boxes = {};
+                    $('.dragbox',self.ui.content()).each(function(){
+                        boxes[$('h2',this).text()] = $('.dragbox-content table, #propertyImage',this);
+                    });
+                    return boxes;
+                }
+            },
+            jail: function() {
+
+            },
+            hospital: function() {
+
+            },
+            items: function() {
+
+            },
+            racing: {
+                front: function() {
+
+                },
+                cars: function() {
+
+                },
+                parts: function() {
+
+                }
+
+            },
+            gym: function() {
+
+            },
+            crimes: function() {
+
+            },
+            casino: function() {
+
+            }
+        },
+
+        currentPageContent: function() {
+
         }
     };
     
@@ -49,7 +95,7 @@ TornAPI = function(p) {
         profile: function() {
             return cachedValue('user/profile',function() {
                 var values = {};
-                var page = getPageSync('profiles.php?XID='+self.user.id());
+                var page = getPageSync('profiles',{XID:self.user.id()});
                 var wrapper = $('.profileWrapper',page.ui.content());
                 var basicInfo = $('#basicInfo',wrapper);
                 var infoBoxLeft = $('#infoBoxLeft',wrapper);
@@ -75,6 +121,32 @@ TornAPI = function(p) {
                 return values;
             });
         },
+        homeInfo: function() {
+            return cachedValue('user/homeinfo',function() {
+                var perks, workingstats, battlestats, values = {
+                    'Perks':perks = {},
+                    'Working Stats':workingstats = {},
+                    'Battle Stats':battlestats = {}
+                };
+                var boxes = getPageSync('index').ui.pageContent.home.getBoxes();
+
+                $('tr:not(:last-child) td',boxes['Personal Perks']).each(function(){
+                    var spl = $(this).text().split(': ');
+                    if(perks[spl[0]] == undefined) perks[spl[0]] = [];
+                    perks[spl[0]].push(spl[1]);
+                });
+
+                $('tr',boxes['Working Stats']).each(function(){
+                    workingstats[$('td:eq(0)',this).text().split(/\b/)[0]] = Utils.number($('td:eq(1)',this).text());
+                });
+
+                $('tr',boxes['Battle Stats']).each(function(){
+                    battlestats[$('td:eq(0)',this).text().split(/\b/)[0]] = Utils.number($('td:eq(1)',this).text());
+                });
+
+                return values;
+            },0)
+        },
 
         status: {
             isInJail: function() {
@@ -83,6 +155,7 @@ TornAPI = function(p) {
             isInHospital: function() {
 
             },
+            /* Is either isFlying or isLanded (Not in Torn) */
             isTraveling: function() {
 
             },
@@ -132,19 +205,36 @@ TornAPI = function(p) {
 
         perks: {
             all: function() {
-
+                var all = [], perks = self.user.homeInfo().Perks;
+                for(var t in perks)
+                    all = all.concat(perks[t]);
+                return all;
             },
             education: function() {
-
+                return self.user.homeInfo().Perks.Education;
             },
             job: function() {
-
+                return self.user.homeInfo().Perks.Job;
             },
+            /* Company 2.0 update? */
+            /*
             company: function() {
 
-            },
+            },*/
             faction: function() {
-
+                return self.user.homeInfo().Perks.Faction;
+            },
+            enhancer: function() {
+                return self.user.homeInfo().Perks.Enhancer;
+            },
+            merit: function() {
+                return self.user.homeInfo().Perks.Merit;
+            },
+            property: function() {
+                return self.user.homeInfo().Perks.Property;
+            },
+            stock: function() {
+                return self.user.homeInfo().Perks.Stock;
             },
             byEffect: {
                 nerve: function() {
@@ -275,8 +365,4 @@ TornAPI = function(p) {
         }
 
     };
-    
-    this.pagecontent = function(){
-        
-    }
 }

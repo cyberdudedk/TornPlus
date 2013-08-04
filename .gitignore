@@ -222,3 +222,6 @@ pip-log.txt
 
 #Web.config
 web.config
+
+#TornLocalDev
+local/

@@ -2,11 +2,17 @@ this.module1 = {
     allpages: new Func('Allpages',
         function(){
             log('All pages: ' + this.var1 + " = " + this.var2);
-            log(Torn.user.id() + " : " + Torn.user.name());
+            //log(Torn.user.id() + " : " + Torn.user.name());
             //log(Torn.user.profile());
             //log(Torn.user.faction());
             //log(Torn.user.factionId());
-            log(Torn.user.education());
+            //log(Torn.user.education());
+            //log(Torn.style.isOld());
+            //log(Torn.user.homeInfo());
+            //log(Torn.user.perks.faction());
+            //log(Torn.user.perks.education());
+            //log(Torn.user.perks.all());
+            
         })
     .pages('allpages')
     .desc('sdfsf')
