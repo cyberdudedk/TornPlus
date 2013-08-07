@@ -4,7 +4,7 @@
    Should be objects consisting of sub objects, arrays and values.
    */
 
- var exampleDataList = {
+ ({
     'somekey':'somevalue',
     'someotherkey':[1,2,3]
-}
+});

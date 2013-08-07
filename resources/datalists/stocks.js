@@ -1,7 +1,7 @@
 /* apr = Annual Percentage Rate.
    avgpayout: Average payout in days.
  */
-var stocksDatalist = {
+({
     1: {
         acronym: 'TCSB',
         name: "Torn City and Shanghi Banking Corporation",
@@ -295,4 +295,4 @@ var stocksDatalist = {
         }],
         apr: 20
     }
-}
+});

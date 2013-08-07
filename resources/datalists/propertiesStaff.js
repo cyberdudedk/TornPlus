@@ -1,4 +1,4 @@
-var propertiesStaffDatalist = {
+({
     'maid': {
         '1x': {
             cost: 5000,
@@ -62,4 +62,4 @@ var propertiesStaffDatalist = {
         happy: 50
 
     }
-}
+});

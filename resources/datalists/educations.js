@@ -1,4 +1,4 @@
-var educationsDatalist = {
+({
     biology: [{
         id: "BIO1340",
         name: "Introduction to Biochemistry",
@@ -1261,4 +1261,4 @@ var educationsDatalist = {
         energy: 50,
         tier: 3
     }]
-}
+});

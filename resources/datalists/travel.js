@@ -1,4 +1,4 @@
-var travelDatalist = {
+({
     'mexico': {
         cost: 6500,
         time: {
@@ -98,4 +98,4 @@ var travelDatalist = {
             business: 89
         }
     }
-}
+});

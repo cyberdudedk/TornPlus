@@ -1,4 +1,4 @@
-var ranksDatalist = {
+({
     1:'Absolute beginner',
     2:'Beginner',
     3:'Inexperienced',
@@ -25,4 +25,4 @@ var ranksDatalist = {
     24:'Legendary',
     25:'Elite',
     26:'Invincible'
-}
+});

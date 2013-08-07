@@ -1,4 +1,4 @@
-var gymDatalist = {
+({
     light: [{
         name: "Premier Fitness",
         cost: 10,
@@ -251,4 +251,4 @@ var gymDatalist = {
         defense: 9,
         dexterity: 9
     }]
-}
+});

@@ -40,7 +40,10 @@ Utils = {
         return $html;
     },
     endsWith: function(str,suffix) {
-        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        return str.toString().indexOf(suffix, str.toString().length - suffix.length) !== -1;
+    },
+    br2nl: function (str) {
+        return str.replace(/<br\s*\/?>/mg,"\n");
     }
 
 };

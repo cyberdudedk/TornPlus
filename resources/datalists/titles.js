@@ -1,4 +1,4 @@
-var titlesDatalist = [
+([
     'Antagonist',
     'Bondsman',
     'Booster',
@@ -36,4 +36,4 @@ var titlesDatalist = [
     'Tourist',
     'Trader',
     'Tycoon'
-]
+]);

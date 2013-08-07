@@ -1,4 +1,4 @@
-var propertiesUpgradesDatalist = {
+({
     interior: {
         sufficient: {
             cost: '25%',
@@ -9,7 +9,7 @@ var propertiesUpgradesDatalist = {
             happy: '50%'
         }
     },
-    hot_tub: {
+    hottub: {
         cost: 17000,
         happy: 25
     },
@@ -35,7 +35,7 @@ var propertiesUpgradesDatalist = {
         cost: 250000,
         happy: 50
     },
-    open_bar: {
+    bar: {
         cost: 9000,
         happy: 50
     },
@@ -53,7 +53,7 @@ var propertiesUpgradesDatalist = {
             happy: 100
         }
     },
-    medical: {
+    medical_facility: {
         cost: 17000000,
         happy: 50
     },
@@ -65,4 +65,4 @@ var propertiesUpgradesDatalist = {
         cost: 895000000,
         happy: 500
     }
-}
+});

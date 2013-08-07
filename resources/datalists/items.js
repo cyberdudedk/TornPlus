@@ -1,4 +1,4 @@
-var itemsDatalist = {
+({
     1: 'Hammer',
     2: 'Baseball Bat',
     3: 'Crow Bar',
@@ -665,4 +665,4 @@ var itemsDatalist = {
     682: 'EOD Pants',
     683: 'EOD Boots',
     684: 'EOD Gloves'
-}
+});

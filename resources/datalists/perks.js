@@ -1,4 +1,4 @@
-var perksDatalist = {
+({
     'x Hospital time': {
         type: 'Faction',
         sign: '−'
@@ -591,4 +591,4 @@ var perksDatalist = {
         type: 'Enhancer',
         sign: '+'
     }
-}
+});

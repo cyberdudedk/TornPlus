@@ -5,14 +5,26 @@ this.module1 = {
             //log(Torn.user.id() + " : " + Torn.user.name());
             //log(Torn.user.profile());
             //log(Torn.user.faction());
-            //log(Torn.user.factionId());
+            //log(Torn.user.faction.Id());
             //log(Torn.user.education());
             //log(Torn.style.isOld());
             //log(Torn.user.homeInfo());
             //log(Torn.user.perks.faction());
             //log(Torn.user.perks.education());
             //log(Torn.user.perks.all());
+            //log(Torn.user.status.isInJail());
             
+            //log(Torn.user.donator.isDonator());
+            //log(Torn.user.donator.days());
+            //log(Torn.user.donator.isSubscriber());
+            //log(Torn.user.unlockables.hasNotebook());
+            //log(Torn.user.unlockables.hasFriendslist());
+            //log(Torn.user.unlockables.hasBlacklist());
+
+            //log(Torn.user.property.owned());
+            //log(Torn.user.property.current());
+
+
         })
     .pages('allpages')
     .desc('sdfsf')

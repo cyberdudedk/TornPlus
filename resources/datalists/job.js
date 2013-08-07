@@ -1,4 +1,4 @@
-var jobDatalist = {
+({
     starter: {
         army: [{
             rank: 1,
@@ -2710,5 +2710,4 @@ var jobDatalist = {
             }
         }
     }
-
-}
+});

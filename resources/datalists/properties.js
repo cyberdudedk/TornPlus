@@ -1,4 +1,4 @@
-var propertiesDatalist = {
+({
     'shack': {
         cost: 0,
         happy: 100,
@@ -8,7 +8,7 @@ var propertiesDatalist = {
                 sufficient: false,
                 superior: false
             },
-            hot_tub: false,
+            hottub: false,
             sauna: false,
             pool: {
                 small: false,
@@ -16,13 +16,13 @@ var propertiesDatalist = {
                 large: false
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -58,7 +58,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: false,
+            hottub: false,
             sauna: false,
             pool: {
                 small: false,
@@ -66,13 +66,13 @@ var propertiesDatalist = {
                 large: false
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -108,7 +108,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: false,
+            hottub: false,
             sauna: false,
             pool: {
                 small: false,
@@ -116,13 +116,13 @@ var propertiesDatalist = {
                 large: false
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -158,7 +158,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: false,
@@ -166,13 +166,13 @@ var propertiesDatalist = {
                 large: false
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -208,7 +208,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -216,13 +216,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -258,7 +258,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -266,13 +266,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -308,7 +308,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -316,13 +316,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -358,7 +358,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -366,13 +366,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: false,
+            bar: false,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -408,7 +408,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -416,13 +416,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -458,7 +458,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -466,13 +466,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -508,7 +508,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -516,13 +516,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: true,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: false,
                 medium: false,
                 large: false
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -558,7 +558,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -566,13 +566,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: false,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: true,
                 medium: true,
                 large: true
             },
-            medical: false,
+            medical_facility: false,
             airstrip: false,
             yacht: false
         },
@@ -608,7 +608,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -616,13 +616,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: true,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: true,
                 medium: true,
                 large: true
             },
-            medical: true,
+            medical_facility: true,
             airstrip: false,
             yacht: false
         },
@@ -658,7 +658,7 @@ var propertiesDatalist = {
                 sufficient: true,
                 superior: true
             },
-            hot_tub: true,
+            hottub: true,
             sauna: true,
             pool: {
                 small: true,
@@ -666,13 +666,13 @@ var propertiesDatalist = {
                 large: true
             },
             shooting_range: true,
-            open_bar: true,
+            bar: true,
             vault: {
                 small: true,
                 medium: true,
                 large: true
             },
-            medical: true,
+            medical_facility: true,
             airstrip: true,
             yacht: true
         },
@@ -699,4 +699,4 @@ var propertiesDatalist = {
             pilot: true
         }
     }
-}
+});

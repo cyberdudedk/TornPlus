@@ -1,5 +1,5 @@
 /* TODO: Shoplifting has an extra depth that is currently missing here */
-var crimesDatalist = {
+({
     'Search for cash': {
         key: 'searchstreets',
         crimes: [{
@@ -463,4 +463,4 @@ var crimesDatalist = {
             page: 4
         }]
     }
-}
+});

@@ -297,6 +297,7 @@ appAPI = ({
         getImage: (function () {}),
         parseIncludeJS: (function () {}),
         includeCSS: (function () {}),
+        includeJS: (function () {}),
         addInlineJS: (function () {}),
         parseTemplate: (function () {}),
         createImage: (function () {}),

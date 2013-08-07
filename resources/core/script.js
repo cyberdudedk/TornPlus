@@ -182,6 +182,9 @@ Script = {
             Script._username = ids[id];
         }
     },
+    getDataList: function(list) {
+        return eval(appAPI.resources.get('datalists/'+list+'.js'));
+    },
 
 
 
