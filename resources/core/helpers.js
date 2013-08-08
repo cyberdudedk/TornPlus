@@ -28,16 +28,36 @@ Utils = {
     },
     createCleanBody: function (html) 
     {
-        var doc = document.implementation.createHTMLDocument('temp');
+        var doc = document.implementation.createHTMLDocument('');
+        /* Get body tag and attributes, for reapplying afterwards. */
+        result = /<body ?(.*?)>/ig.exec(html);
+        var bodyAttrs = {};
+        result.forEach(function(v,i){
+            if(i > 0 && v != '')  {
+                var spl = v.split('=');
+                bodyAttrs[spl[0]] = spl[1].replace(/"/g,'');
+            }
+        });
+
+        /* Loads entire document, with head, etc. Doesn't work in FF :( */
+        //doc.open(); //doc.write(html); //doc.close();
+
+        /* Fix for getting a Body, but head and body attributes is stripped out :( */
         doc.body.innerHTML = html;
-        return doc.body;
+
+        /* Reapplying body attributes */
+        var $bod = $(doc.body);
+        for(var key in bodyAttrs) {
+            $bod.attr(key,bodyAttrs[key]);
+        }
+
+        return $bod;
     },
     getCleanHtml: function(html)
     {
         html = Utils.createCleanBody(html);
-        $html = $(html);
-        $html.find('img').attr('src','');
-        return $html;
+        html.find('img').attr('src','');
+        return html;
     },
     endsWith: function(str,suffix) {
         return str.toString().indexOf(suffix, str.toString().length - suffix.length) !== -1;

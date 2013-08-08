@@ -207,10 +207,10 @@ TornAPI = function(p) {
 
         status: {
             isInJail: function() {
-                return $('body',page).attr('bgcolor') == '#BBA47E';
+                return page.attr('bgcolor') == '#BBA47E';
             },
             isInHospital: function() {
-
+                return page.attr('bgcolor') == '#FFFFFF';
             },
             /* Is either isFlying or isLanded (Not in Torn) */
             isTraveling: function() {
