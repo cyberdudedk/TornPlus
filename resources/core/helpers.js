@@ -56,7 +56,12 @@ Utils = {
     getCleanHtml: function(html)
     {
         html = Utils.createCleanBody(html);
-        html.find('img').attr('src','');
+        /* Removes Src from Imgs to stop the browser from loading the images, and puts the src as origSrc.
+           jQuery "extension" to override attr('src') request is included in project */
+        html.find('img').each(function(){
+            $(this).attr('origsrc',$(this).attr('src'));
+            $(this).attr('src','');
+        });
         return html;
     },
     endsWith: function(str,suffix) {
@@ -143,3 +148,17 @@ Helpers = {
 jQuery.fn.textOnly = function() {
     return $(this).clone().children().remove().end().text();
 };
+
+(function(){
+    /* jQuery "extension" to override attr('src') request, to check for origsrc */
+    var originalAttrMethod = jQuery.fn.attr;
+    jQuery.fn.attr = function(){
+        if(arguments.length == 1 && arguments[0] == 'src') {
+            var val = originalAttrMethod.apply( this, ['origsrc'] );
+            if(typeof(val) == 'undefined' || val === false)
+                val = originalAttrMethod.apply( this, ['src'] );
+            return val;
+        } else
+            return originalAttrMethod.apply( this, arguments );
+    }
+})();

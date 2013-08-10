@@ -52,27 +52,8 @@ TornAPI = function(p) {
                 }
             },
             properties: {
-                propertyList: function() {
-                    var properties = [];
-                    var numKeys = ['upkeep','staff cost','happiness','vault'];
-                    self.ui.content().filter('table').find('tr:gt(0) td:last-child').each(function(){
-                        var prop = {};
-                        $(this).html().split('<br>').forEach(function(v,i){
-                            var text = $('<span>'+v+'</span>').text().trim();
-                            if(text != '')
-                            {
-                                var spl = text.toLowerCase().split(': ');
-                                var key = spl[0];
-                                var value = spl[1];
-                                if($.inArray(key,numKeys) > -1) value = Utils.number(value);
-                                prop[key] = value;
-                            }
-
-                        });
-                        prop['id'] = Utils.number($(this).find('a[href^="properties.php?step=info"]').prop('href'));
-                        properties.push(prop);
-                    });
-                    return properties;
+                getRows: function() {
+                    return self.ui.content().filter('table').find('tr:gt(0) td:last-child');
                 }
             },
             propertyInfo: {
@@ -92,6 +73,19 @@ TornAPI = function(p) {
                     });
                     return staff;
                 }
+            },
+            points: {
+                getItems: function() {
+                    return self.ui.content().filter('table').find('> tbody > tr > td:not(:empty)');
+                }
+            },
+            merits: {
+                getRows: function() {
+                    return self.ui.content().find('tr.bgAlt1, tr.bgAlt2');
+                },
+                getHeader: function() {
+                    return self.ui.content().filter('table:first').find('td');
+;                }
             },
             jail: function() {
 
@@ -203,7 +197,16 @@ TornAPI = function(p) {
             });
             return icons;
         },
-        
+        pointsInfo: function() {
+            return cachedValue('user/pointsinfo',function(){
+                if(self.user.status.isInHospital()) return null;
+                var points = {};
+                getPageSync('points').ui.pageContent.points.getItems().each(function() {
+                    points[$('.ptitle',this).text()] = {points: Utils.number($('.pvalue',this).text()), inactive: $(this).find('a.inline').hasClass('inactive')};
+                });
+                return points;
+            });
+        },
 
         status: {
             isInJail: function() {
@@ -313,6 +316,28 @@ TornAPI = function(p) {
             }
         },
 
+        merits: {
+            available: function() {
+                return cachedValue('user/merits/available',function() {
+                    return Utils.number(getPageSync('merits').ui.pageContent.merits.getHeader().find('b').eq(3).text());
+                });
+            },
+            used: function() {
+                return cachedValue('user/merits/used',function() {
+                    return Utils.number(getPageSync('merits').ui.pageContent.merits.getHeader().find('b').eq(4).text());
+                });
+            },
+            upgrades: function() {
+                return cachedValue('user/merits/upgrades',function() {
+                    var upgrades = {};
+                    getPageSync('merits').ui.pageContent.merits.getRows().each(function(){
+                        upgrades[$(this).find('b').text()] = Utils.number($(this).find('img').attr('src'));
+                    });
+                    return upgrades;
+                });
+            }
+        },
+
         job: {
             isInJob: function() {
 
@@ -339,11 +364,30 @@ TornAPI = function(p) {
         property: {
             owned: function() {
                 return cachedValue('user/property/owned',function(){
-                    return getPageSync('properties').ui.pageContent.properties.propertyList();
+                    if(self.user.status.isInHospital()) return null;
+                    var properties = [];
+                    var numKeys = ['upkeep','staff cost','happiness','vault'];
+                    getPageSync('properties').ui.pageContent.properties.getRows().each(function(){
+                        var prop = {};
+                        $(this).html().split('<br>').forEach(function(v,i){
+                            var text = $('<span>'+v+'</span>').text().trim();
+                            if(text != '') {
+                                var spl = text.toLowerCase().split(': ');
+                                var key = spl[0];
+                                var value = spl[1];
+                                if($.inArray(key,numKeys) > -1) value = Utils.number(value);
+                                prop[key] = value;
+                            }
+                        });
+                        prop['id'] = Utils.number($(this).find('a[href^="properties.php?step=info"]').prop('href'));
+                        properties.push(prop);
+                    });
+                    return properties;
                 });
             },
             current: function() {
                 return cachedValue('user/property/current',function() {
+                    if(self.user.status.isInHospital()) return null;
                     var cur = self.user.property.owned()[0];
                     var page = getPageSync('properties',{step:'info',ID:cur.id});
                     var mods = page.ui.pageContent.propertyInfo.modifications();
@@ -364,7 +408,7 @@ TornAPI = function(p) {
                             if(Utils.endsWith(u.happy,'%')) u.happy = (Utils.number(u.happy) / 100)*curPropInfo.happy;
                             addto[v] = u;
                         });
-                    }
+                    };
                     loopFunc(mods,dlUpgrades,cur['upgrades'] = {});
                     loopFunc(staff,dlStaff,cur['staff'] = {});
                     return cur;
@@ -407,22 +451,25 @@ TornAPI = function(p) {
 
         unlockables: {
             hasBazaar: function() {
-
+                return self.user.pointsInfo()['Bazaar'].inactive;
             },
             hasDisplayCase: function() {
-
+                return self.user.pointsInfo()['Display Cabinet'].inactive;
             },
             hasRacing: function() {
-
+                return self.user.pointsInfo()['Racing Licence'].inactive;
             },
             hasStockTicker: function() {
-
+                return self.user.pointsInfo()['Stock Ticker'].inactive;
+            },
+            hasCityWatch: function() {
+                return self.user.pointsInfo()['City Watch'].inactive;
             },
             hasMuseum: function() {
-
+                return $.inArray('+ Museum Unlocked',self.user.perks.education()) > -1;
             },
             hasSports: function() {
-
+                return $.inArray('+ Sports Shop Unlocked',self.user.perks.education()) > -1;
             },
             hasNotebook: function() {
                 return self.user.donator.isDonator();
@@ -442,7 +489,6 @@ TornAPI = function(p) {
                 });
             },
             isSubscriber: function() {
-                //Subscriber icon with end date
                 return cachedValue('user/donator/subscriber',function() {
                     return self.user.icons()['Subscriber'] != undefined;
                 });

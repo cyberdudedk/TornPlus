@@ -13,6 +13,7 @@ this.module1 = {
             //log(Torn.user.perks.education());
             //log(Torn.user.perks.all());
             //log(Torn.user.status.isInJail());
+            //log(Torn.user.status.isInHospital());
             
             //log(Torn.user.donator.isDonator());
             //log(Torn.user.donator.days());
@@ -24,6 +25,19 @@ this.module1 = {
             //log(Torn.user.property.owned());
             //log(Torn.user.property.current());
 
+            //log(Torn.user.unlockables.hasBazaar());
+            //log(Torn.user.unlockables.hasDisplayCase());
+            //log(Torn.user.unlockables.hasRacing());
+            //log(Torn.user.unlockables.hasStockTicker());
+            //log(Torn.user.unlockables.hasCityWatch());
+            
+            //log(Torn.user.unlockables.hasMuseum());
+            //log(Torn.user.unlockables.hasSports());
+
+            //log(Torn.user.merits.available());
+            //log(Torn.user.merits.used());
+            //log(Torn.user.merits.upgrades());
+            
 
         })
     .pages('allpages')
