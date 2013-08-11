@@ -1,9 +1,6 @@
 /*
 TODO List
 - Reregister modules on new version/updated script
-- Options page/panel to enable functions and set function options.
-  Dynamically generated using the desc and options set on the module Functions.
-- 
 */
 
 /* Due to Crossrider's getFolderContent function only seeing files in the crossrider project, 
@@ -11,7 +8,6 @@ TODO List
     Should be cleared when Crossrider source is updated.
  */
 var devFiles = [];//["module3","dev"];
-
 
 var $, Torn, cachedValue, getPage, getPageSync;
 
@@ -22,6 +18,7 @@ appAPI.ready(function(jq) {
     /* Return/End script if not on a Torn page. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
+
     $ = jq;
     this.onerror = function(e){error(e);};
 
@@ -35,7 +32,7 @@ appAPI.ready(function(jq) {
     Script.loadModule = function(mod) {
         appAPI.resources.includeJS('modules/'+mod+'.js');
         this.loadedModules[mod] = true;
-    }
+    };
 
     /* Message listner for communication with background and popup scope */
     appAPI.message.addListener(function(msg){
@@ -79,7 +76,6 @@ appAPI.ready(function(jq) {
 /***** Some debug functionality *********/
 
 /* Shorthand for debug */
-
 log = function(msg) {
     console.debug(msg);
 }

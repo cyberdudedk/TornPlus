@@ -121,6 +121,7 @@ TornAPI = function(p) {
         },
 
         currentPageContent: function() {
+            
 
         }
     };
@@ -163,10 +164,11 @@ TornAPI = function(p) {
         },
         homeInfo: function() {
             return cachedValue('user/homeinfo',function() {
-                var perks, workingstats, battlestats, values = {
+                var perks, workingstats, battlestats, jobinformation, values = {
                     'Perks':perks = {},
                     'Working Stats':workingstats = {},
-                    'Battle Stats':battlestats = {}
+                    'Battle Stats':battlestats = {},
+                    'Job Information':jobinformation = {}
                 };
                 var boxes = getPageSync('index').ui.pageContent.home.getBoxes();
 
@@ -184,6 +186,10 @@ TornAPI = function(p) {
                     battlestats[$('td:eq(0)',this).text().split(/\b/)[0]] = Utils.number($('td:eq(1)',this).text());
                 });
 
+                $('tr',boxes['Job Information']).each(function(){
+                    var spl = $(this).text().split(': ');
+                    jobinformation[spl[0]] = ($.inArray(spl[0],['Income','Job points']) > -1 ? Utils.number(spl[1]) : spl[1]);
+                });
                 return values;
             })
         },
@@ -209,6 +215,9 @@ TornAPI = function(p) {
         },
 
         status: {
+            isInTornOkay: function() {
+                return !self.user.statis.isInHospital() && !self.user.statis.isInJail() && !self.user.statis.isTraveling();
+            },
             isInJail: function() {
                 return page.attr('bgcolor') == '#BBA47E';
             },
@@ -217,13 +226,13 @@ TornAPI = function(p) {
             },
             /* Is either isFlying or isLanded (Not in Torn) */
             isTraveling: function() {
-
+                //TODO: Implement
             },
             isFlying: function() {
-
+                //TODO: Implement
             },
             isLanded: function() {
-
+                //TODO: Implement
             },
             inCountry: {
                 mexico: function() {
@@ -232,7 +241,7 @@ TornAPI = function(p) {
                 /* TODO: More */
             },
             isInWhichCountry: function() {
-
+                //TODO: Implement
             }
         },
 
@@ -339,23 +348,67 @@ TornAPI = function(p) {
         },
 
         job: {
+            /* TODO: Check if correctly works with Company employement
+               TODO: Check if return correctly when in no job */
             isInJob: function() {
-
+                return self.user.homeInfo()['Job Information']['Job'] != 'None'; //TODO: Is this right? When not in job?
+            },
+            isInStarter: function() {
+                return self.user.homeInfo()['Job Information']['Job'] != 'Employee';
+            },
+            isInCompany: function() {
+                return self.user.homeInfo()['Job Information']['Job'] == 'Employee';
             },
             jobType: function() {
-
+                return self.user.homeInfo()['Job Information']['Job'];
             },
             company: function() {
-
+                return self.user.homeInfo()['Job Information']['Company'];
             },
             rank: function() {
-
+                return self.user.homeInfo()['Job Information']['Rank'];
             },
             specials: function() {
-
+                return cachedValue('user/job/specials', function() {
+                    var jobsData = Script.getDataList('job');
+                    var info;
+                    if(self.user.job.isInCompany()) {
+                        info = jobsData['companies'][self.user.job.company()];
+                        //TODO: Extract information from datalist on company, needs employee/company stars to get information
+                    } else {
+                        info = jobsData['starter'][self.user.job.jobType().toLowerCase()];
+                        var rank = self.user.job.rank();
+                        var rankInfo;
+                        var specials = [];
+                        for(var index in info) {
+                            rankInfo = info[index];
+                            if(rankInfo.special != undefined) specials.push(rankInfo.special);
+                            if(rankInfo.position == rank)
+                                break;
+                        }
+                        return specials;
+                    }
+                });
             },
             gains: function() {
-
+                return cachedValue('user/job/gains', function() {
+                    var jobsData = Script.getDataList('job');
+                    var info;
+                    if(self.user.job.isInCompany()) {
+                        info = jobsData['companies'][self.user.job.company()];
+                        //TODO: Extract information from datalist on company, needs employee/company stars to get information
+                    } else {
+                        info = jobsData['starter'][self.user.job.jobType().toLowerCase()];
+                        var rank = self.user.job.rank();
+                        var rankInfo;
+                        for(var index in info) {
+                            rankInfo = info[index];
+                            if(rankInfo.position == rank)
+                                break;
+                        }
+                        return rankInfo.statsgain;
+                    }
+                });
             }
 
         },

@@ -2,8 +2,10 @@
 /* Utils contains general Javascript functions usable several places */
 Utils = {
     number: function(str) {
+        var m;
         if(str == undefined) return undefined;
-        return Number(str.match(/^[\s\S]*?\$?(([\d]*?,?)*[\d]*?[.]?[\d]+)[^\d]*?$/m)[1].replace(/,/g,'')); //Extract integer or float value
+        if((m = str.match(/^[\s\S]*?\$?(([\d]*?,?)*[\d]*?[.]?[\d]+)[^\d]*?$/m)) == undefined) return undefined;
+        return Number(m[1].replace(/,/g,'')); //Extract integer or float value
     },
     querystringToObject: function(query) {
         if (query == '' || typeof(query) == 'undefined') return {};

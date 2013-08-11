@@ -37,6 +37,15 @@ this.module1 = {
             //log(Torn.user.merits.available());
             //log(Torn.user.merits.used());
             //log(Torn.user.merits.upgrades());
+
+            //log(Torn.user.job.isInJob());
+            //log(Torn.user.job.isInCompany() );
+            //log(Torn.user.job.isInStarter() );
+            //log(Torn.user.job.company());
+            //log(Torn.user.job.rank() );
+            //log(Torn.user.job.gains() );
+            //log(Torn.user.job.specials() );
+
             
 
         })
