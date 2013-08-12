@@ -55,7 +55,10 @@ this.module1 = {
             log(Torn.user.stats.recruit());
             log(Torn.user.stats.roulette());
             log(Torn.user.stats.detailed());
+
+            log(Torn.user.items.list());
             */
+
 
 
 

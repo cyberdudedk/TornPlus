@@ -1,5 +1,5 @@
 /* API class, instance takes page content as parameter, and uses that for base.
-    This means we can get content of a page using XHR and pass it through this API to get a ready API for usage
+    This means we can get content of a page using XHR and pass it through this API to get a API ready for usage
  */
 TornAPI = function(p) {
     var page = jQuery(p);
@@ -101,13 +101,18 @@ TornAPI = function(p) {
                     return $('.list tr:gt(0)',self.ui.content());
                 }
             },
+            items: {
+                getTables: function() {
+                    return self.ui.content().find('.data');
+                },
+                getItems: function() {
+                    return self.ui.content().find('.data tbody tr');
+                }
+            },
             jail: function() {
 
             },
             hospital: function() {
-
-            },
-            items: function() {
 
             },
             racing: {
@@ -260,7 +265,31 @@ TornAPI = function(p) {
             }
         },
 
+        items: {
+            list: function() {
+                return cachedValue('user/items/list',function(){
+                    var items = {};
+                    getPageSync('item').ui.pageContent.items.getItems().each(function(){
+                        var itemTd = $('td:eq(0)',this),
+                            actions = {},
+                            actionIds = {};
 
+                        itemTd.find('a:gt(0)').each(function(){
+                            var key = $(this).text(),
+                            num = Utils.number($(this).attr('href'));
+                            actions[key] = (num > 1000 ? 'uid' : 'id');
+                            actionIds[key] = num;
+                        });
+                        var quantity = Utils.number(itemTd.textOnly().trim()) || 1,
+                            id = Utils.number(itemTd.find('a:first').attr('href')),
+                            name = itemTd.find('a:first').text(),
+                            uniqueid = actionIds['Send'] || actionIds['Return'];
+                        items[id] = {actions:actions,uid:uniqueid,name:name,quantity:quantity,id:id};
+                    });
+                    return items;
+                },0);
+            }
+        },
 
         faction: {
             info: function() {
