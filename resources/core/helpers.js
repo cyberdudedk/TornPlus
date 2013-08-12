@@ -32,15 +32,17 @@ Utils = {
     {
         var doc = document.implementation.createHTMLDocument('');
         /* Get body tag and attributes, for reapplying afterwards. */
-        result = /<body ?(.*?)>/ig.exec(html);
         var bodyAttrs = {};
-        result.forEach(function(v,i){
-            if(i > 0 && v != '')  {
-                var spl = v.split('=');
-                bodyAttrs[spl[0]] = spl[1].replace(/"/g,'');
-            }
-        });
+        result = /<body ?(.*?)>/ig.exec(html);
+        if(result != null) {
 
+            result.forEach(function(v,i){
+                if(i > 0 && v != '')  {
+                    var spl = v.split('=');
+                    bodyAttrs[spl[0]] = spl[1].replace(/"/g,'');
+                }
+            });
+        }
         /* Loads entire document, with head, etc. Doesn't work in FF :( */
         //doc.open(); //doc.write(html); //doc.close();
 

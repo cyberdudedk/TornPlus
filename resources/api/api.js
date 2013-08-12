@@ -9,10 +9,10 @@ TornAPI = function(p) {
             return $('#banner').size() == 0;
         },
         isMobile: function() {
-            return false; //TODO: Detection needed
+            return false; /* TODO: Detection needed */
         },
         isRespo: function() {
-            return false; //TODO: Detection needed when Respo is released
+            return false; /* TODO: Detection needed when Respo is released */
         }
     } 
 
@@ -57,21 +57,13 @@ TornAPI = function(p) {
                 }
             },
             propertyInfo: {
-                modifications: function() {
-                    var mods = [];
+                getModifications: function() {
                     var spl = $('<div></div>').append(self.ui.content().clone()).html().split('(Hover over the images to see further details)');
-                    $(spl[1]).filter('img').each(function(){
-                        mods.push($(this).prop('title').toLowerCase());
-                    });
-                    return mods;
+                    return $(spl[1]).filter('img');
                 },
-                staff: function() {
-                    var staff = [];
+                getStaff: function() {
                     var spl = $('<div></div>').append(self.ui.content().clone()).html().split('(Hover over the images to see further details)');
-                    $(spl[2]).filter('img').each(function(){
-                        staff.push($(this).prop('title').toLowerCase().replace(' service',''));
-                    });
-                    return staff;
+                    return $(spl[2]).filter('img');
                 }
             },
             points: {
@@ -85,7 +77,29 @@ TornAPI = function(p) {
                 },
                 getHeader: function() {
                     return self.ui.content().filter('table:first').find('td');
-;                }
+                }
+            },
+            recruit: {
+                getPlayers: function() {
+                    return self.ui.content().filter('.data').find('tbody tr');
+                }
+            },
+            casino: {
+                roulette: {
+                    getStatistics: function() {
+                        return self.ui.content().find('table.data:eq(1) tr:gt(1)');
+                    }
+                },
+                poker: {
+                    getScore: function() {
+                        return $('<div></div>').append(self.ui.content().clone()).textOnly().replace(/[\[\]>]/g,'').trim();
+                    }
+                }
+            },
+            personalstats: {
+                getRows: function() {
+                    return $('.list tr:gt(0)',self.ui.content());
+                }
             },
             jail: function() {
 
@@ -97,24 +111,19 @@ TornAPI = function(p) {
 
             },
             racing: {
-                front: function() {
-
+                getHeader: function() {
+                    return self.ui.content().filter('table:first');
                 },
-                cars: function() {
-
-                },
-                parts: function() {
-
+                getCars: function() {
+                    return self.ui.content().filter('table:gt(0)');
                 }
-
             },
-            gym: function() {
-
+            gym: {
+                getInfo: function() {
+                    return $('#gymExpTabs',page);
+                }
             },
             crimes: function() {
-
-            },
-            casino: function() {
 
             }
             /* TODO: More */
@@ -164,11 +173,12 @@ TornAPI = function(p) {
         },
         homeInfo: function() {
             return cachedValue('user/homeinfo',function() {
-                var perks, workingstats, battlestats, jobinformation, values = {
+                var perks, workingstats, battlestats, jobinformation, factioninformation, values = {
                     'Perks':perks = {},
                     'Working Stats':workingstats = {},
                     'Battle Stats':battlestats = {},
-                    'Job Information':jobinformation = {}
+                    'Job Information':jobinformation = {},
+                    'Faction Information':factioninformation = {}
                 };
                 var boxes = getPageSync('index').ui.pageContent.home.getBoxes();
 
@@ -189,6 +199,11 @@ TornAPI = function(p) {
                 $('tr',boxes['Job Information']).each(function(){
                     var spl = $(this).text().split(': ');
                     jobinformation[spl[0]] = ($.inArray(spl[0],['Income','Job points']) > -1 ? Utils.number(spl[1]) : spl[1]);
+                });
+
+                $('tr',boxes['Faction Information']).each(function(){
+                    var spl = $(this).text().split(': ');
+                    factioninformation[spl[0]] = ($.inArray(spl[0],['Days in Faction','Respect','Rank','Members']) > -1 ? Utils.number(spl[1]) : spl[1]);
                 });
                 return values;
             })
@@ -226,13 +241,13 @@ TornAPI = function(p) {
             },
             /* Is either isFlying or isLanded (Not in Torn) */
             isTraveling: function() {
-                //TODO: Implement
+                /* TODO: Implement */
             },
             isFlying: function() {
-                //TODO: Implement
+                /* TODO: Implement */
             },
             isLanded: function() {
-                //TODO: Implement
+                /* TODO: Implement */
             },
             inCountry: {
                 mexico: function() {
@@ -241,7 +256,7 @@ TornAPI = function(p) {
                 /* TODO: More */
             },
             isInWhichCountry: function() {
-                //TODO: Implement
+                /* TODO: Implement */
             }
         },
 
@@ -286,8 +301,7 @@ TornAPI = function(p) {
             job: function() {
                 return self.user.homeInfo().Perks.Job;
             },
-            /* Company 2.0 update? */
-            /*
+            /* Company 2.0 update?
             company: function() {
 
             },*/
@@ -354,10 +368,10 @@ TornAPI = function(p) {
                 return self.user.homeInfo()['Job Information']['Job'] != 'None'; //TODO: Is this right? When not in job?
             },
             isInStarter: function() {
-                return self.user.homeInfo()['Job Information']['Job'] != 'Employee';
+                return $.inArray(self.user.homeInfo()['Job Information']['Job'],['Employee','Director']) == -1;
             },
             isInCompany: function() {
-                return self.user.homeInfo()['Job Information']['Job'] == 'Employee';
+                return $.inArray(self.user.homeInfo()['Job Information']['Job'],['Employee','Director']) > -1;
             },
             jobType: function() {
                 return self.user.homeInfo()['Job Information']['Job'];
@@ -375,6 +389,7 @@ TornAPI = function(p) {
                     if(self.user.job.isInCompany()) {
                         info = jobsData['companies'][self.user.job.company()];
                         //TODO: Extract information from datalist on company, needs employee/company stars to get information
+                        //TODO: Rank when director is "Director", get specials based on company stars?
                     } else {
                         info = jobsData['starter'][self.user.job.jobType().toLowerCase()];
                         var rank = self.user.job.rank();
@@ -397,6 +412,7 @@ TornAPI = function(p) {
                     if(self.user.job.isInCompany()) {
                         info = jobsData['companies'][self.user.job.company()];
                         //TODO: Extract information from datalist on company, needs employee/company stars to get information
+                        //TODO: Rank when director is "Director", get gains based on company stars?
                     } else {
                         info = jobsData['starter'][self.user.job.jobType().toLowerCase()];
                         var rank = self.user.job.rank();
@@ -443,14 +459,21 @@ TornAPI = function(p) {
                     if(self.user.status.isInHospital()) return null;
                     var cur = self.user.property.owned()[0];
                     var page = getPageSync('properties',{step:'info',ID:cur.id});
-                    var mods = page.ui.pageContent.propertyInfo.modifications();
-                    var staff = page.ui.pageContent.propertyInfo.staff();
+                    var modsImg = page.ui.pageContent.propertyInfo.getModifications();
+                    var staffImg = page.ui.pageContent.propertyInfo.getStaff();
                     var dlProp = Script.getDataList('properties');
                     var dlStaff = Script.getDataList('propertiesStaff');
                     var dlUpgrades = Script.getDataList('propertiesUpgrades');
                     var curPropInfo = dlProp[cur.property];
                     var sizes = ['small','medium','large','sufficient','superior','1x','2x','3x','5x','10x'];
-
+                    var mods = [],
+                    staff = [];
+                    modsImg.each(function(){
+                        mods.push($(this).prop('title').toLowerCase());
+                    });
+                    staffImg.each(function(){
+                        staff.push($(this).prop('title').toLowerCase().replace(' service',''));
+                    });
                     var loopFunc = function(loop, list, addto){
                         loop.forEach(function(v){
                             var size,
@@ -472,31 +495,122 @@ TornAPI = function(p) {
 
         stats: {
             working: function() {
-
+                return self.user.homeInfo()['Working Stats'];
             },
             battle: function() {
-
+                return self.user.homeInfo()['Battle Stats'];
             },
             detailed: function() {
+                return cachedValue('user/stats/detailed',function() {
+                    var match,
+                    myregexp = /(\d*)([dhms])/g,
+                    stats = {},
+                    curheader,
+                    convert = function(val) {
+                        var totalSec = 0;
+                        var multi = {s:1, m:60, h:3600, d:86400};
+                        val = val.replace(/[$,]| \([\d\.]*[%s]\)/g,'');
+                        var num = Number(val);
+                        if(!isNaN(num)) return num;
+                        while ((match = myregexp.exec(val)) != null) {
+                            totalSec += (multi[match[2]] * Number(match[1]));
+                        }
+                        return totalSec;
+                    };
 
+                    getPageSync('personalstats').ui.pageContent.personalstats.getRows().each(function(){
+                        if($(this).find('td').size() == 1) {
+                            curheader = $(this).find('td b').text();
+                            stats[curheader] = {};
+                        }else {
+                            stats[curheader][$(this).find('td:eq(0)').text().slice(0,-1)] = convert($(this).find('td:eq(1)').text());
+                        }
+                    });
+                    return stats;
+                });
             },
             racing: function() {
+                return cachedValue('user/stats/racing',function(){
+                    var stats = {};
+                    var lvls = {'None':0,'F':1,'D':2,'C':3,'B':4,'A':5};
+                    var carsRegex = /([^\r\n\s][\s\S]*?): ([\s\S]+)/m;
+                    if(!self.user.unlockables.hasRacing()) return stats;
+                    var page = getPageSync('racing',{step:'cars'});
+                    var header = page.ui.pageContent.racing.getHeader();
+                    var carsTabels = page.ui.pageContent.racing.getCars();
+                    stats['class'] = 'None';
+                    stats['skill'] = Utils.number(header.find('table font:last').text());
+                    stats['class'] = header.find('td:last img').attr('title').slice(-1);
+                    stats['level'] = lvls[stats['class']];
 
+                    var cars = [];
+                    carsTabels.each(function(){
+                        var car = {'Car':$('tr:eq(1) > td:eq(0) b',this).text()};
+                        $('tr:eq(1) > td:eq(1) td',this).text().split('\n').slice(2).forEach(function(v) {
+                            var m = carsRegex.exec(v);
+                            if(m != null)
+                                car[m[1]] = Utils.number(m[2]);
+                        });
+                        cars.push(car);
+                    });
+
+                    stats['cars'] = {
+                        unsorted: cars,
+                        sorted: cars.slice().sort(function(a,b){
+                                    return a['Car'] == 'None' || (b['Races won'] - a['Races won']);
+                                })
+                    }
+                    return stats;
+                });
             },
             gym: function() {
-
+                return cachedValue('user/stats/gym', function() {
+                    var gymInfo = getPageSync('includes/embeddedgym1').ui.pageContent.gym.getInfo();
+                    var gymClass = {1:'Light',2:'Middle',3:'Heavy',4:'Special'};
+                    var gymStat = {};
+                    for(gym in gymClass)
+                    {
+                        var lis = $(gymInfo).find('#tabs-'+gym+' li');
+                        gymStat[gymClass[gym]] = {max:lis.size(),unlocked:lis.filter('.active, .enter').size()};
+                    }
+                    return gymStat;
+                });
             },
             poker: function() {
-
+                return cachedValue('user/stats/poker',function(){
+                    return {Score:Utils.number(getPageSync('poker').ui.pageContent.casino.poker.getScore())};
+                });
             },
             roulette: function() {
-
+                return cachedValue('user/stats/roulette',function() {
+                    var stats = {};
+                    getPageSync('roulettegame',{step:'showStatistic'}).ui.pageContent.casino.roulette.getStatistics().each(function(){
+                        stats[$('td:eq(0)',this).text()] = Utils.number($('td:eq(1)',this).text());
+                    });
+                    return stats;
+                });
             },
             faction: function() {
-
+                return self.user.homeInfo()['Faction Information'];
             },
             recruit: function() {
-
+                return cachedValue('user/stats/recruit',function() {
+                    var players = [];
+                    getPageSync('bringafriend').ui.pageContent.recruit.getPlayers().each(function(){
+                        var tds = $(this).find('td');
+                        players.push({
+                            name: tds.eq(2).find('a').text(),
+                            id: Utils.number(tds.eq(2).find('a').attr('href')),
+                            level: Utils.number(tds.eq(3).text()),
+                            lastonline: tds.eq(4).text(),
+                            signedup: tds.eq(5).text(),
+                            completion: Utils.number(tds.eq(6).text())
+                        });
+                    });
+                    return players.sort(function(a,b) {
+                        return b.level - a.level;
+                    });
+                },1,true);
             }
         },
 
