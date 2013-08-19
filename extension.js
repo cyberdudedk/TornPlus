@@ -7,13 +7,13 @@ TODO List
     and not files added in local debug mode, use this devFiles array to add modules added in local debug mode.
     Should be cleared when Crossrider source is updated.
  */
-var devFiles = [];//["module3","dev"];
+var devFiles = ['chat'];
 
 var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
-
     //return; /* Disable */
+    //appAPI.internal.reloadBackground();
 
     /* Return/End script if not on a Torn page. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
@@ -29,10 +29,10 @@ appAPI.ready(function(jq) {
     
     /* For some (unknown) reason, calling includeJS function outside appAPI.ready scope crashes it.*/
     /* So this is a hack */
-    Script.loadModule = function(mod) {
+    /*Script.loadModule = function(mod) {
         appAPI.resources.includeJS('modules/'+mod+'.js');
         this.loadedModules[mod] = true;
-    };
+    };*/
 
     /* Message listner for communication with background and popup scope */
     appAPI.message.addListener(function(msg){
@@ -52,6 +52,7 @@ appAPI.ready(function(jq) {
     getPage = Helpers.getPage;
     getPageSync = Helpers.getPageSync;
 
+    Script.Dev.loadBackground();
     /* Use this to test collecting all cache from scratch */
     //Script.clearCache();
     //Script.clearStorage();
@@ -77,34 +78,35 @@ appAPI.ready(function(jq) {
 
 /* Shorthand for debug */
 log = function(msg) {
-    console.debug(msg);
+    console.debug.apply(console,arguments);
 }
 error = function(msg) {
-    console.debug('Error: ' + msg);
+    arguments[0] = 'Error: ' + arguments[0];
+    console.debug.apply(console,arguments);
 }
 
 /* In Firefox send debug info to Firebug console instead of Firefox Error Console (Ctrl+Shift+J) */
 if (appAPI.browser.name == "firefox") {
   console = { 
-    log: function(m) { 
-        try { unsafeWindow.console.log(m); } 
-        catch(e) { alert(m); } 
+    log: function(msg) {
+        try { unsafeWindow.console.log.apply(console,arguments); }
+        catch(e) { alert(msg); }
     },
-    warn: function(m) { 
-        try { unsafeWindow.console.warn(m); } 
-        catch(e) { alert(m); } 
+    warn: function(msg) {
+        try { unsafeWindow.console.warn.apply(console,arguments); }
+        catch(e) { alert(msg); }
     },
-    error: function(m) { 
-        try { unsafeWindow.console.error(m); } 
-        catch(e) { alert(m); } 
+    error: function(msg) {
+        try { unsafeWindow.console.error.apply(console,arguments); }
+        catch(e) { alert(msg); }
     },
-    info: function(m) { 
-        try { unsafeWindow.console.info(m); } 
-        catch(e) { alert(m); } 
+    info: function(msg) {
+        try { unsafeWindow.console.info.apply(console,arguments); }
+        catch(e) { alert(msg); }
     },
-    debug: function(m) { 
-        try { unsafeWindow.console.debug(m); } 
-        catch(e) { alert(m); } 
+    debug: function(msg) {
+        try { unsafeWindow.console.debug.apply(console,arguments); }
+        catch(e) { alert(msg); }
     }
   }  
 }

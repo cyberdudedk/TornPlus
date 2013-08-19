@@ -134,6 +134,7 @@ function crossriderMain(jq) {
 }
 
 var continueLoad = function(id) {
+
     if(id == null) {
         $('#status').text('Login to Torn and try again');
         return;
@@ -142,95 +143,100 @@ var continueLoad = function(id) {
     eval(appAPI.resources.get('core/script.js'));
     Script.setUserId(id);
     $('#status').text('Loaded profile for user: ' + Script.userName() + ' [' + Script.userId() + ']');
-
     /* For some (unknown) reason, calling includeJS function outside appAPI.ready scope crashes it.*/
     /* So this is a hack */
-    Script.loadModule = function(mod) {
+/*    Script.loadModule = function(mod) {
         appAPI.resources.includeJS('modules/'+mod+'.js'); //In background scope probably eval .get is needed, but hack might still apply
         this.loadedModules[mod] = true;
     }
+*/
+    //moduleInfos = appAPI.db.get('moduleInfos');
+    Script.getModuleInfos(function(moduleInfos) {
+        var options = Script.getValue('moduleOptions') || {};
 
-    moduleInfos = appAPI.db.get('moduleInfos');
-    var options = Script.getValue('moduleOptions') || {};
+        var enabledFunc = options['enabled'] || {};
+        var funcOptions = options['options'] || {};
 
-    var enabledFunc = options['enabled'] || {};
-    var funcOptions = options['options'] || {};
-    for(var f in moduleInfos)
-    {
-        var mod = moduleInfos[f];
-        var cat = (mod.category || 'misc').toLowerCase();
-        if(typeof(sortedInfos[cat]) == 'undefined') sortedInfos[cat] = [];
-        mod.funcname = f;
-        sortedInfos[cat].push(mod);
-    }
-
-    var generateValue = function(name,value,opt) {
-        var obj = "" + value;
-        switch(opt.type) {
-            case 'boolean':
-                obj = $('<input type="checkbox">').attr('name',name).val(1).prop('checked', value);
-            break;
-
-            case 'string':
-                obj = $('<input type="text">').attr('name',name).val(value);
-            break;
-
-            case 'int':
-                obj = $('<input type="text">').attr('name',name).val(value).on('keyup', function () {
-                    this.value = this.value.replace(/[^0-9]/gi, '');
-                });
-            break;
-
-            default:
-                log(name + ' : ' + opt.type + ' = ' + value);
-            break;
-
+        for(var f in moduleInfos)
+        {
+            var mod = moduleInfos[f];
+            var cat = (mod.category || 'misc').toLowerCase();
+            if(typeof(sortedInfos[cat]) == 'undefined') sortedInfos[cat] = [];
+            mod.funcname = f;
+            sortedInfos[cat].push(mod);
         }
-        return obj;
-    }
 
-    $cat = $('#categories ul');
-    for(var cat in sortedInfos) {
-        var c = cat.charAt(0).toUpperCase() + cat.slice(1); //Capitalizing first char
-        
-        $cat.append('<li><a href="#">'+c+'</a></li>');
-        var funcsDiv = $('#functions');
-        $funccat = $('<div class="funccategories" name="'+cat+'" style="display:none;"></div>').appendTo(funcsDiv);
-        
-        var funcs = sortedInfos[cat];
-        for(f in funcs) {
-            var func = funcs[f];
-           
-            $options = $('<div class="function_options">');
-            for(var i in (func.options || []))
-            {
-                var opt = func.options[i];
-                $options.append(
-                    $('<div class="function_option"></div>').append(
-                        $('<div class="function_option_name"></div>').append(opt.name),
-                        //$('<div class="function_option_value"><input type="textbox" name="options['+func.funcname+']['+opt.name+']" value="'+(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value)+'"/></div>')
-                        $('<div class="function_option_value"></div>').append(generateValue('options['+func.funcname+']['+opt.name+']',(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value), opt))
-                    )
-                );    
+        var generateValue = function(name,value,opt) {
+            var obj = "" + value;
+            switch(opt.type) {
+                case 'boolean':
+                    obj = $('<input type="checkbox">').attr('name',name).val(1).prop('checked', value);
+                break;
+
+                case 'string':
+                    obj = $('<input type="text">').attr('name',name).val(value);
+                break;
+
+                case 'int':
+                    obj = $('<input type="text">').attr('name',name).val(value).on('keyup', function () {
+                        this.value = this.value.replace(/[^0-9]/gi, '');
+                    });
+                break;
+
+                default:
+                    log(name + ' : ' + opt.type + ' = ' + value);
+                break;
+
             }
-
-            $($funccat).append(
-                $('<div class="function"></div>').append(
-                        $('<div class="function_enable"><input type="checkbox" name="enabled['+func.funcname+']" value="1"'+(enabledFunc[func.funcname] || false ? 'checked="checked"':'')+'/></div>'),
-                        $('<div class="function_name">'+func.title+'</div>'),
-                        $options
-                    )
-            );
+            return obj;
         }
-    }
-    
-    $('#categories li a').click(function() {
-        $('.active').removeClass('active');
-        $(this).parent().addClass('active');
-        var cat = $(this).parent().text().toLowerCase();
-        $('#functions .funccategories').hide();
-        $('#functions .funccategories[name="'+cat+'"]').show();        
+
+        $cat = $('#categories ul');
+        for(var cat in sortedInfos) {
+            var c = cat.charAt(0).toUpperCase() + cat.slice(1); //Capitalizing first char
+
+            $cat.append('<li><a href="#">'+c+'</a></li>');
+            var funcsDiv = $('#functions');
+            $funccat = $('<div class="funccategories" name="'+cat+'" style="display:none;"></div>').appendTo(funcsDiv);
+
+            var funcs = sortedInfos[cat];
+            for(f in funcs) {
+                var func = funcs[f];
+
+                $options = $('<div class="function_options">');
+                for(var i in (func.options || []))
+                {
+                    var opt = func.options[i];
+                    $options.append(
+                        $('<div class="function_option"></div>').append(
+                            $('<div class="function_option_name"></div>').append(opt.name),
+                            //$('<div class="function_option_value"><input type="textbox" name="options['+func.funcname+']['+opt.name+']" value="'+(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value)+'"/></div>')
+                            $('<div class="function_option_value"></div>').append(generateValue('options['+func.funcname+']['+opt.name+']',(funcOptions[func.funcname] ? (funcOptions[func.funcname][opt.name] ? funcOptions[func.funcname][opt.name] : opt.value) : opt.value), opt))
+                        )
+                    );
+                }
+
+                $($funccat).append(
+                    $('<div class="function"></div>').append(
+                            $('<div class="function_enable"><input type="checkbox" name="enabled['+func.funcname+']" value="1"'+(enabledFunc[func.funcname] || false ? 'checked="checked"':'')+'/></div>'),
+                            $('<div class="function_name">'+func.title+'</div>'),
+                            $options
+                        )
+                );
+            }
+        }
+
+
+        $('#categories li a').click(function() {
+            $('.active').removeClass('active');
+            $(this).parent().addClass('active');
+            var cat = $(this).parent().text().toLowerCase();
+            $('#functions .funccategories').hide();
+            $('#functions .funccategories[name="'+cat+'"]').show();
+        });
     });
+
+
     
     $('#btnSave').click(function(){
         var values = $('#values').serializeForm();

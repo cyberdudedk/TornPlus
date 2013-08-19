@@ -1,4 +1,4 @@
-this.module1 = {
+({
     allpages: new Func('Allpages',
         function(){
             log('All pages: ' + this.var1 + " = " + this.var2);
@@ -80,4 +80,4 @@ this.module1 = {
                 log('bulk use');
             }).desc('Add a bulk use button to items').pages(['item'])
     }
-};
+})

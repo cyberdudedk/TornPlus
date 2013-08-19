@@ -1,4 +1,4 @@
-this.module2 = {   
+({
     gym: {
         helper: new Func('GymHelper2',
         function(){
@@ -7,4 +7,4 @@ this.module2 = {
     ).category('gyM').pages('gym')
     .desc('Gym Helper')
     }
-}
+})

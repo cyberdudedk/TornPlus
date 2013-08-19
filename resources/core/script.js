@@ -4,6 +4,7 @@ Script = {
     devFiles: (typeof(devFiles) != 'undefined' ? devFiles : []),
     forceRegisterAll: false,
     loadedModules: {},
+    loadedCSS: {},
     modulePages: {},
     moduleInfos: {},
     tempValues: {},
@@ -11,71 +12,70 @@ Script = {
     loadModule: function(mod){
         appAPI.resources.includeJS('modules/'+mod+'.js');
     },*/
-    getModulePages: function() {
-        var pages = appAPI.db.get('modulePages');
-        if(pages == null || this.forceRegisterAll == true) {
-            this.registerAndStoreModules();
-            pages = this.modulePages;
-        }
-        return pages;
+    getModulePages: function(callback) {
+        var pages = appAPI.db.async.get('modulePages',function(pages) {
+                if(pages == null || Script.forceRegisterAll == true) {
+                    Script.registerAndStoreModules();
+                    pages = Script.modulePages;
+                }
+                callback(pages);
+            });
     },
-    getModuleInfos: function() {
-        var infos = appAPI.db.get('moduleInfos');
-        if(infos == null || this.forceRegisterAll == true) {
-            this.registerAndStoreModules();
-            infos = this.moduleInfos;    
-        }
-        return infos;
+    getModuleInfos: function(callback) {
+        appAPI.db.async.get('moduleInfos',function(infos) {
+            if(infos == null || Script.forceRegisterAll == true) {
+                Script.registerAndStoreModules();
+                infos = this.moduleInfos;
+            }
+            callback(infos);
+        });
     },
     registerAndStoreModules: function() {
         this.registerAllModules();
         pages = this.modulePages;
         moduleInfos = this.moduleInfos;
-        appAPI.db.set('modulePages',pages);
-        appAPI.db.set('moduleInfos',moduleInfos);
+        appAPI.db.async.set('modulePages',pages);
+        appAPI.db.async.set('moduleInfos',moduleInfos);
     },
     
     run: function(){
         var options = Script.getValue('moduleOptions') || {};
         var enabledFunc = options['enabled'] || {};
         var funcOptions = options['options'] || {};
-        
+        var that = this;
         var call, func, typ, fId;        
-        var pages = this.getModulePages();
-        var page = location.pathname.substring(location.pathname.lastIndexOf('/')+1).split('.')[0];
-        var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1));
-        var pageFuncs = (pages["allpages"] || []).concat(pages[page] || []);
-        for(var f in pageFuncs) {
-            var pageFunc = pageFuncs[f];
-            if(enabledFunc[pageFunc] == true) {
-                var arr = pageFunc.split('/');
-                var mod = arr.shift();
-                if(this.loadedModules[mod] == undefined) {
-                    this.loadModule(mod);
-                }
-                call = this[mod];
-                for(fId in arr) {
-                    typ = typeof(call[arr[fId]]);
-                    if(typ == 'function' || typ == 'object')
-                        call = call[arr[fId]];
-                    else {
-                        log('Failed1 to call ' + pageFunc + ' function');
-                        break;
+        var pages = this.getModulePages(function(pages) {
+            var page = location.pathname.substring(location.pathname.lastIndexOf('/')+1).split('.')[0];
+            var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1));
+            var pageFuncs = (pages["allpages"] || []).concat(pages[page] || []);
+            for(var f in pageFuncs) {
+                var pageFunc = pageFuncs[f];
+                if(enabledFunc[pageFunc] == true) {
+                    var arr = pageFunc.split('/');
+                    var mod = arr.shift();
+                    call = that.getModule(mod);
+                    for(fId in arr) {
+                        typ = typeof(call[arr[fId]]);
+                        if(typ == 'function' || typ == 'object')
+                            call = call[arr[fId]];
+                        else {
+                            log('Failed1 to call ' + pageFunc + ' function');
+                            break;
+                        }
                     }
+                    if(call != that[mod] && typeof(call) == 'object' && call instanceof Func)                 {
+                        var optValues = call.getDefaults();
+                        $.extend(optValues,funcOptions[pageFunc])
+                        if(optValues != undefined) {
+                            for(var opt in optValues)
+                                call[opt] = optValues[opt];
+                        }
+                        call._funct();
+                    } else
+                        log('Failed2 to call ' + pageFunc + ' function');
                 }
-                if(call != this[mod] && typeof(call) == 'object' && call instanceof Func)                 {
-                    var optValues = call.getDefaults();
-                    $.extend(optValues,funcOptions[pageFunc]) 
-                    
-                    if(optValues != undefined) {
-                        for(var opt in optValues)
-                            call[opt] = optValues[opt];
-                    }
-                    call._funct();
-                } else
-                    log('Failed2 to call ' + pageFunc + ' function');
             }
-        }
+        });
     },
     recursiveLoadModule: function(modname, mod){
         if(typeof(mod) != 'undefined') {
@@ -88,14 +88,14 @@ Script = {
                     for(pageId in pages) {
                         page = pages[pageId];
                         if(this.modulePages[page] == undefined) this.modulePages[page] = [];
-                        this.modulePages[page].push(funcName);    
+                        this.modulePages[page].push(funcName);
                     }
                     var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':func._options};
                     this.moduleInfos[funcName] = obj;
-                    
                 }
                 else {
-                    this.recursiveLoadModule(funcName,func)
+                    if(typeof(func) == 'object')
+                        this.recursiveLoadModule(funcName,func,true);
                 }
             }
         }
@@ -108,9 +108,10 @@ Script = {
         var patt = new RegExp(/modules\/(.*?)\.js/i);
         for(var fId in files) {
             var mod = patt.exec(files[fId])[1];
-            this.loadModule(mod);
-            call = this[mod];
-            this.recursiveLoadModule(mod,call);
+            if(this.loadedModules[mod] == undefined) {
+                call = this.getModule(mod);
+                this.recursiveLoadModule(mod,call);
+            }
         }
     },
     clearCache: function() {
@@ -124,6 +125,7 @@ Script = {
     },
     clearStorage: function () {
         appAPI.db.removeAll();
+        appAPI.db.async.removeAll();
     },
     setValue: function(key,value,toTemp) {
         if(typeof(toTemp) == 'undefined') toTemp = false;
@@ -153,11 +155,8 @@ Script = {
         if(id != null)
         {
             Script._username = name;
-
             Script._userid = id;
-
             var users = Script.getRegisteredIds();
-
             //if(typeof(users[id]) == 'undefined')
             //{
                 users[id] = name;
@@ -184,6 +183,25 @@ Script = {
     },
     getDataList: function(list) {
         return eval(appAPI.resources.get('datalists/'+list+'.js'));
+    },
+    getModule: function(mod) {
+        if(typeof(this.loadedModules[mod]) != 'undefined') {
+            return this.loadedModules[mod];
+        } else {
+            return this.loadModule(mod);
+        }
+    },
+    loadModule: function(mod) {
+        var module = eval(appAPI.resources.get('modules/'+mod+'.js'));
+        //appAPI.resources.includeJS('modules/'+mod+'.js'); //In background scope probably eval .get is needed, but hack might still apply
+        this.loadedModules[mod] = module;
+        return module;
+    },
+    loadCSS: function(name) {
+        if(typeof(this.loadedCSS[name]) == 'undefined') {
+            appAPI.resources.includeCSS('css/'+name+'.css');
+            this.loadedCSS[name] = true;
+        }
     },
 
 
