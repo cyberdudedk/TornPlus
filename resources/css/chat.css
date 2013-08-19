@@ -1,0 +1,71 @@
+.emoticon {
+    background-image: url(resource-image://images/smileys.gif);
+    width: 15;
+    height: 15;
+    display:inline-block;
+    background-position: 0px 0px;
+}
+
+.emoticon.laughing{background-position:-14px 0px;}
+.emoticon.smile{background-position:-1px -1px;}
+.emoticon.laughing{background-position:-16px -1px;}
+.emoticon.angry{background-position:-46px -1px;}
+.emoticon.blushing{background-position:-91px -1px;}
+.emoticon.thumbsup{background-position:-106px -1px;}
+.emoticon.music{background-position:-121px -1px;}
+.emoticon.kiss{background-position:-136px -1px;}
+.emoticon.blink{background-position:-1px -16px;}
+.emoticon.upsidedown{background-position:-16px -16px;}
+.emoticon.surprised{background-position:-31px -16px;}
+.emoticon.xd{background-position:-61px -16px;}
+.emoticon.undecided{background-position:-76px -16px;}
+.emoticon.ninja{background-position:-91px -16px;}
+.emoticon.thumbsdown{background-position:-106px -16px;}
+.emoticon.nuclear{background-position:-121px -16px;}
+.emoticon.rose{background-position:-136px -16px;}
+.emoticon.shock{background-position:-61px -31px;}
+.emoticon.sarcastic{background-position:-76px -31px;}
+.emoticon.alien{background-position:-91px -31px;}
+.emoticon.beer{background-position:-106px -31px;}
+.emoticon.ffinger{background-position:-121px -31px;}
+.emoticon.heart{background-position:-136px -31px;}
+.emoticon.clown{background-position:-1px -46px;}
+.emoticon.tongue{background-position:-16px -46px;}
+.emoticon.frown{background-position:-46px -46px;}
+.emoticon.worried{background-position:-61px -46px;}
+.emoticon.devil{background-position:-76px -46px;}
+.emoticon.question{background-position:-91px -46px;}
+.emoticon.cigarette{background-position:-106px -46px;}
+.emoticon.wow{background-position:-1px -61px;}
+.emoticon.cool{background-position:-16px -61px;}
+.emoticon.confused{background-position:-31px -61px;}
+.emoticon.cry{background-position:-46px -61px;}
+.emoticon.pirate{background-position:-76px -61px;}
+.emoticon.xbox{background-position:-91px -61px;}
+.emoticon.coffee{background-position:-106px -61px;}
+.emoticon.dogpoo{background-position:-121px -61px;}
+.emoticon.biggrin{background-position:-1px -76px;}
+.emoticon.coolcig{background-position:-16px -76px;}
+.emoticon.evil{background-position:-31px -76px;}
+.emoticon.sidehappy{background-position:-61px -76px;}
+.emoticon.weirdo{background-position:-76px -76px;}
+.emoticon.right{background-position:-91px -76px;}
+.emoticon.coke{background-position:-106px -76px;}
+.emoticon.cat{background-position:-121px -76px;}
+.emoticon.bigsmile{background-position:-1px -91px;}
+.emoticon.embarrassed{background-position:-16px -91px;}
+.emoticon.mad{background-position:-31px -91px;}
+.emoticon.whistling{background-position:-46px -91px;}
+.emoticon.nerd{background-position:-61px -91px;}
+.emoticon.sick{background-position:-76px -91px;}
+.emoticon.movie{background-position:-91px -91px;}
+.emoticon.pepsi{background-position:-106px -91px;}
+.emoticon.brokenheart{background-position:-121px -91px;}
+
+.chatcommands {
+
+}
+
+.chatcommands.me {
+    color: purple;
+}
