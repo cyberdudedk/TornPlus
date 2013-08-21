@@ -1,4 +1,3 @@
-
 /* Main script class, containg functionality to handle module loading, registering, running etc. */
 Script = {
     devFiles: (typeof(devFiles) != 'undefined' ? devFiles : []),
@@ -8,12 +7,23 @@ Script = {
     modulePages: {},
     moduleInfos: {},
     tempValues: {},
-    /* For unknown reasons creating this here, outside of appAPI.ready crashes        
-    loadModule: function(mod){
-        appAPI.resources.includeJS('modules/'+mod+'.js');
-    },*/
+    pageCallbacks: {},
+    init: function() {
+        appAPI.dom.addInlineJS('var retrieve = function(channel,val) {$("body").fireExtensionEvent("dataRet",{channel:channel,value:val});  }; setTimeout(function(){CrossriderAPI.bindExtensionEvent(document.body, "dataSend", function(e, data) {retrieve(data.channel,eval(data.action)); }) })');
+        $('body').bindExtensionEvent('dataRet', function(e, data) {
+            if(typeof(Script.pageCallbacks[data.channel]) == 'function') {
+                Script.pageCallbacks[data.channel].call(null,data.value);
+            }
+        });
+    },
+    fromPage: function(channel,func,callback) {
+        Script.pageCallbacks[channel] = callback;
+        setTimeout(function() {
+            $('body').fireExtensionEvent('dataSend', {channel:channel,action:"("+func.toString()+")('"+channel+"')"});
+        });
+    },
     getModulePages: function(callback) {
-        var pages = appAPI.db.async.get('modulePages',function(pages) {
+        appAPI.db.async.get('modulePages',function(pages) {
                 if(pages == null || Script.forceRegisterAll == true) {
                     Script.registerAndStoreModules();
                     pages = Script.modulePages;
@@ -37,8 +47,8 @@ Script = {
         appAPI.db.async.set('modulePages',pages);
         appAPI.db.async.set('moduleInfos',moduleInfos);
     },
-    
     run: function(){
+
         var options = Script.getValue('moduleOptions') || {};
         var enabledFunc = options['enabled'] || {};
         var funcOptions = options['options'] || {};
@@ -54,6 +64,7 @@ Script = {
                     var arr = pageFunc.split('/');
                     var mod = arr.shift();
                     call = that.getModule(mod);
+                    var module = call;
                     for(fId in arr) {
                         typ = typeof(call[arr[fId]]);
                         if(typ == 'function' || typ == 'object')
@@ -70,6 +81,7 @@ Script = {
                             for(var opt in optValues)
                                 call[opt] = optValues[opt];
                         }
+                        call._setModule(module);
                         call._funct();
                     } else
                         log('Failed2 to call ' + pageFunc + ' function');
@@ -263,5 +275,3 @@ Script = {
         }
     }
 }
-
-

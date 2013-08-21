@@ -3,7 +3,6 @@
 * Font family?
 * Special commands? (Noicons, etc)
 * */
-
 /* Format:
 * BBCode: [{BBCODE}]CONTENT[/{BBCODE}]
 * BBCode: [{BBCODE}={DATA}]CONTENT[/{BBCODE}]
@@ -21,7 +20,7 @@
 4 /noicons, (collect /noicons, /noformat /noformaticons into 1 with sub value/arg?) 'TODO: implement
 5 /noformat 'TODO: implement
 6 /noformaticons 'TODO: implement
-7 
+7
 8
 
 12 //Signal TornPlus chat enabled on this message by this user? If this flag is not there, ignore.
@@ -52,19 +51,49 @@
 */
 
 ({
+
+    hookCallbacks: [],
+    hookedChat: false,
+    hookChat: function(callback) {
+        this.hookCallbacks.push(callback);
+        var that = this;
+        if(this.hookedChat == false) {
+            this.hookedChat = true;
+            Script.fromPage('chatServer',
+                function(channel) {
+                    chatServer.onMessageReceived(function() {
+                        retrieve(channel,arguments);
+                    });
+                },
+                function(data) {
+                    if(data != undefined) {
+                        that.hookCallbacks.forEach(function(clback) {
+                            clback.call(that,data);
+                        });
+                    }
+                });
+        }
+    },
+
     clicklinks: new Func('Clickable links', function(){
         var replaced;
-        var linkify = Script.getModule('chat').Helpers.linkify.html;
-        setInterval(function() {
-            $('.message:not(.tpchat_links)').each(function(){
-                curhtml = $(this).html();
-                replaced = linkify(curhtml);
-                if(curhtml != replaced) {
-                    $(this).html(replaced);
-                }
-                $(this).addClass('tpchat_links');
-            });
-        },500);
+        var linkify = this.module.Helpers.linkify.html;
+
+        var perform = function() {
+            curhtml = $(this).html();
+            replaced = linkify(curhtml);
+            if(curhtml != replaced) {
+                $(this).html(replaced);
+            }
+        }
+
+        this.module.hookChat(function(data) {
+            perform.call($('#'+data[0]));
+        });
+
+        $('.message').each(function(){
+            perform.call(this);
+        })
     })
     .category('Chat')
     .desc('Turn urls into clickable links')
@@ -73,16 +102,21 @@
 
     newline: new Func('Allow newlines',function() {
         var replaced;
-        setInterval(function(){
-            $('.message:not(.tpchat_nl)').each(function(){
-                curhtml = $(this).html();
-                replaced = curhtml.replace(/\n/g,'<br>');
-                if(curhtml != replaced) {
-                    $(this).html(replaced);
-                }
-                $(this).addClass('tpchat_nl');
-            });
-        },500);
+        var perform = function() {
+            curhtml = $(this).html();
+            replaced = curhtml.replace(/\n/g,'<br>');
+            if(curhtml != replaced) {
+                $(this).html(replaced);
+            }
+        }
+
+        this.module.hookChat(function(data) {
+            perform.call($('#'+data[0]));
+        });
+
+        $('.message').each(function(){
+            perform.call(this);
+        });
     })
     .category('Chat')
     .desc('Allow newlines')
@@ -91,9 +125,6 @@
 
     ,
     emoticons: new Func('Emoticons', function() {
-        var replaced;
-        Script.loadCSS('chat');
-
         /* List of smiley names */
         /*
         smile
@@ -149,46 +180,55 @@
         movie
         pepsi
         brokenheart
-        */
+*/
         var mapObj = {
             ':)':"smile",
-            ':d':"happy",
+            ':d':"laughing",
             ':s':"worried",
-            '&lt;3':'heart',
+            '<3':'heart',
             ':@':'devil',
             '(r)':'rose',
             '@-/--':'rose',
             ':o':'surprised',
             ';)':'blink',
             '(u)':'thumbsup',
-            '&lt;/3':'brokenheart',
+            '</3':'brokenheart',
             '8)':'cool',
             ':p':'tongue',
             ':(':'frown',
             'xd':'xd',
-            ':\\|':'undecided',
-            ':/':'undecided',
+            ':|':'undecided',
+            //':/':'undecided', /* Does not play well with urls, probably needs some kind of check to make sure it's not in a url, maybe we need some kind of order these are performed in */
             ':s':'confused',
             ":'(":'cry',
             'o.o':'shock'
-            /* TODO: more */
+            // TODO: more
 
         };
-        var re = new RegExp(Object.keys(mapObj).join("|").replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/\./g,'\\.'),"gi");
 
-        setInterval(function(){
-            $('.message:not(.tpchat_emo)').each(function(){
-                curhtml = $(this).html();
-                replaced = curhtml.replace(re, function(matched){
-                    matched = matched.replace(/\|/g,'\\|');
-                    return '<span title="'+matched+'" class="emoticon '+mapObj[matched.toLowerCase()]+'">&nbsp;</span>';
-                });
-                if(curhtml != replaced) {
-                    $(this).html(replaced);
-                }
-                $(this).addClass('tpchat_emo');
+        var replaced;
+        Script.loadCSS('chat');
+        var regStr = Object.keys(mapObj).join('\n').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/\./g,'\\.').replace(/\|/g,'\\|').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'|');
+        var re = new RegExp(regStr,"gi");
+        
+        var perform = function() {
+            curhtml = $(this).html();
+            replaced = curhtml.replace(re, function(matched){
+                matched =  $("<div />").html(matched).text();
+                return '<span title="'+matched+'" class="emoticon '+mapObj[matched.toLowerCase()]+'">&nbsp;</span>';
             });
-        },200);
+            if(curhtml != replaced) {
+                $(this).html(replaced);
+            }
+        }
+
+        this.module.hookChat(function(data) {
+            perform.call($('#'+data[0]));
+        });
+
+        $('.message').each(function(){
+            perform.call(this);
+        });
     })
     .category('Chat')
     .desc('Enable classic emoticons')
@@ -200,21 +240,27 @@
         var replaced;
         var that = this;
         Script.loadCSS('chat');
-        setInterval(function() {
-            $('.message:not(.tpchat_coms)').each(function(){
-                if(that.Me) {
-                    var msg = $(this).textOnly().trim();
-                    if(msg.slice(0, 4) == '/me ') {
-                        msg = msg.slice(4);
-                        var name = $('b:first a:first',this).text();
-                        replaced = '<span class="chatcommands me">'+name + ' ' + msg +'</span>';
-                        $(this).html(replaced);
-                    }
-                }
 
-                $(this).addClass('tpchat_coms');
-            });
-        },500);
+        var perform = function() {
+            if(that.Me) {
+                var msg = $(this).textOnly().trim();
+                if(msg.slice(0, 4) == '/me ') {
+                    msg = msg.slice(4);
+                    var name = $('b:first a:first',this).text();
+                    replaced = '<span class="chatcommands me">'+name + ' ' + msg +'</span>';
+                    $(this).html(replaced);
+                }
+            }
+        }
+
+        this.module.hookChat(function(data) {
+            perform.call($('#'+data[0]));
+        });
+
+        $('.message').each(function(){
+            perform.call(this);
+        });
+
     })
     .category('Chat')
     .desc('Enables commands')
@@ -251,7 +297,6 @@
         }
 
         var hookedChatBoxfunction = function() {
-
             $('.chatboxtextarea').keydown(function(e) {
                 if(e.which==13&&e.shiftKey==0) {
                     e.preventDefault();
@@ -278,7 +323,7 @@
                     }
                     if(text != "")
                     {
-                        var lasttext = text.replace(/'/g,"\\'").replace(/\n/g,'<br>');
+                        var lasttext = text.replace(/'/g,"\\'").replace(/\n/g,'<br>').replace(/"/g,'\\"');
                         var jsstr = 'chatServer.sendMessage("' + lasttext + '".replace(/<br>/g,"\\n"), "' + id + '")';
                         appAPI.dom.addInlineJS(jsstr);
                     }
@@ -298,34 +343,37 @@
             },200);
 
 
-        setInterval(function() {
-            $('.message:not(.tpchat_chat)').each(function(){ //
-                var msg = $(this).textOnly().slice(1);
-                if(msg.charCodeAt(0) == enums.TORNPLUS)  {
-                    msg = msg.slice(1);
-                    var name = $(this).find('b:first');
-                    var replaced = msg;
-                    while(replaced.match(regex) != undefined) {
-                        replaced = replaced.replace(regex, function(m,m1,m2,m3) {
-                            var type = m1.charCodeAt(0)-128;
-                            var args = [];
-                            for ( var i = 0; i < m2.length; i++ )
-                            {
-                                args.push(m2.charCodeAt(i)-14);
-                            }
-                            return '<span style="'+stylish(type,args)+'">'+m3+'</span>';
-                        });
-                    }
-
-                    if(msg != replaced) {
-                        $(this).html(name.html() + ' ' + replaced);
-                    }
+        var perform = function() {
+            var msg = $(this).textOnly().slice(1);
+            if(msg.charCodeAt(0) == enums.TORNPLUS)  {
+                msg = msg.slice(1);
+                var name = $(this).find('b:first');
+                var replaced = msg;
+                while(replaced.match(regex) != undefined) {
+                    replaced = replaced.replace(regex, function(m,m1,m2,m3) {
+                        var type = m1.charCodeAt(0)-128;
+                        var args = [];
+                        for ( var i = 0; i < m2.length; i++ )
+                        {
+                            args.push(m2.charCodeAt(i)-14);
+                        }
+                        return '<span style="'+stylish.call(that,type,args)+'">'+m3+'</span>';
+                    });
                 }
 
-                $(this).addClass('tpchat_chat');
-            });
-        },100)
+                if(msg != replaced) {
+                    $(this).html(name.html() + ' ' + replaced);
+                }
+            }
+        };
 
+        this.module.hookChat(function(data) {
+            perform.call($('#'+data[0]));
+        });
+
+        $('.message').each(function(){
+            perform.call(this);
+        });
     })
     .category('Chat')
     .desc('Enables Colors, Styles, etc')
@@ -335,7 +383,7 @@
     .option('Styles','boolean',false)
     .option('Font','boolean',false)
     .option('Size','boolean',false)
-    
+
     ,
 
     Helpers: {
@@ -484,38 +532,45 @@
             var enums = helpers.enums;
             switch(type) {
                 case enums.commands.STYLE:
-                    switch(args[0]) {
-                        case enums.style.BOLD:
-                            values['font-weight'] = 'bold';
-                        break;
-                        case enums.style.ITALIC:
-                            values['font-style'] = 'italic';
-                        break;
-                        case enums.style.STRIKETHROUGH:
-                            values['text-decoration'] = 'line-through';
-                        break;
-                        case enums.style.UNDERLINE:
-                            values['text-decoration'] = 'underline';
-                        break;
+                    if(this.Styles) {
+                        switch(args[0]) {
+                            case enums.style.BOLD:
+                                values['font-weight'] = 'bold';
+                            break;
+                            case enums.style.ITALIC:
+                                values['font-style'] = 'italic';
+                            break;
+                            case enums.style.STRIKETHROUGH:
+                                values['text-decoration'] = 'line-through';
+                            break;
+                            case enums.style.UNDERLINE:
+                                values['text-decoration'] = 'underline';
+                            break;
+                        }
                     }
                 break;
                 case enums.commands.COLOR:
-                    if(args.length > 1) {
-                        values['color'] = helpers.hex(args);
-                    } else {
-                        values['color'] = helpers.enums.colors.id[args[0]];
+                    if(this.Colors) {
+                        if(args.length > 1) {
+                            values['color'] = helpers.hex(args);
+                        } else {
+                            values['color'] = helpers.enums.colors.id[args[0]];
+                        }
                     }
-
                 break;
                 case enums.commands.BGCOLOR:
-                    if(args.length > 1) {
-                        values['background-color'] = helpers.hex(args);
-                    } else {
-                        values['background-color'] = helpers.enums.colors.id[args[0]];
+                    if(this.Backgroundcolor) {
+                        if(args.length > 1) {
+                            values['background-color'] = helpers.hex(args);
+                        } else {
+                            values['background-color'] = helpers.enums.colors.id[args[0]];
+                        }
                     }
                 break;
                 case enums.commands.SIZE:
-                    values['font-size'] = (args[0]+7) + 'px';
+                    if(this.Size) {
+                        values['font-size'] = (args[0]+7) + 'px';
+                    }
                 break;
             }
 

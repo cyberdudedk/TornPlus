@@ -17,6 +17,13 @@
 
 /* Base wrapper class for module functions */
 Func = function(title,f) {
+    this.module = {};
+
+    this._setModule = function(mod) {
+        this.module = mod;
+        return this;
+    }
+
     this.pages = function(pages) {
         this._pages = pages;
         return this;
@@ -60,7 +67,7 @@ Func = function(title,f) {
         }
         return def;
     }
-    
+
     if(typeof(f) != 'undefined')
         this.title(title);
     if(typeof(f) != 'undefined')

@@ -13,26 +13,17 @@ var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
     //return; /* Disable */
-    //appAPI.internal.reloadBackground();
-
+    appAPI.internal.reloadBackground();
     /* Return/End script if not on a Torn page. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
-
     $ = jq;
     this.onerror = function(e){error(e);};
-
     appAPI.resources.includeJS('core/script.js');
     appAPI.resources.includeJS('core/helpers.js');
     appAPI.resources.includeJS('core/classes.js');
     appAPI.resources.includeJS('api/api.js');
-    
-    /* For some (unknown) reason, calling includeJS function outside appAPI.ready scope crashes it.*/
-    /* So this is a hack */
-    /*Script.loadModule = function(mod) {
-        appAPI.resources.includeJS('modules/'+mod+'.js');
-        this.loadedModules[mod] = true;
-    };*/
+    Script.init();
 
     /* Message listner for communication with background and popup scope */
     appAPI.message.addListener(function(msg){
@@ -43,6 +34,7 @@ appAPI.ready(function(jq) {
         }
     });
 
+    appAPI.dom.addRemoteJS('https://w9u6a2p6.ssl.hwcdn.net/plugins/javascripts/crossriderAPI.js');
 
     /* Loading an instance of the API with body as content */
     Torn = new TornAPI(document.body);
@@ -61,12 +53,12 @@ appAPI.ready(function(jq) {
     Script.forceRegisterAll = true;
 
     var id = Script.getUser();
-
-    //Only run when we can get the user id 
+    //Only run when we can get the user id
     if(id != null) {
         /* RUN FOREST RUN!!! */
         Script.run();
     }
+
 });
 
 
