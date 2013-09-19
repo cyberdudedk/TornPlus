@@ -83,3 +83,34 @@ Option = function(name,type,value,min,max) {
     if(typeof(max) != 'undefined') obj['max'] = max;
     return obj;
 }
+
+
+  ajaxClass = function() {
+                this.buckets = {};
+                this.ajaxFunc = function(funcName, onlyAjax) {
+                    return this.add('ajaxFunc',funcName, onlyAjax);
+                }
+
+                this.localJS = function(jsName, onlyAjax) {
+                    return this.add('localJS',jsName, onlyAjax);
+                }
+
+                this.tornJS = function(path, onlyAjax) {
+                    return this.add('tornJS',path, onlyAjax);
+                }
+
+                this.localCSS = function(cssName, onlyAjax) {
+                    return this.add('localCSS',cssName, onlyAjax);
+                }
+
+                this.tornCSS = function(path, onlyAjax) {
+                    return this.add('tornCSS',path, onlyAjax);
+                }
+
+                this.add = function(bucketName, value, onlyAjax) {
+                    if(typeof(onlyAjax) == 'undefined') onlyAjax = false;
+                    if(typeof(this.buckets[bucketName]) == 'undefined') this.buckets[bucketName] = [];
+                    this.buckets[bucketName].push({value:value,onlyAjax:onlyAjax});
+                    return this;
+                }
+            }

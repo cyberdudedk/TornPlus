@@ -7,22 +7,33 @@ TODO List
     and not files added in local debug mode, use this devFiles array to add modules added in local debug mode.
     Should be cleared when Crossrider source is updated.
  */
-var devFiles = ['chat'];
+
+/* Short term TODO List
+*
+* */
+var devFiles = ['chat','ajaxify'];
 
 var $, Torn, cachedValue, getPage, getPageSync;
 
 appAPI.ready(function(jq) {
     //return; /* Disable */
-    appAPI.internal.reloadBackground();
-    /* Return/End script if not on a Torn page. */
+
+    /* Return/End script if not on a Torn page, or one of Torn's login pages. */
     if (!appAPI.isMatchPages("*.torn.com/*")) return;
     if (appAPI.isMatchPages("*.torn.com/wiki/*")) return;
+    if (appAPI.isMatchPages("*.torn.com$")) return;
+    if (appAPI.isMatchPages("*.torn.com/login")) return;
+
     $ = jq;
     this.onerror = function(e){error(e);};
+
+    /* TODO: Move all these includes to Script init? */
     appAPI.resources.includeJS('core/script.js');
     appAPI.resources.includeJS('core/helpers.js');
     appAPI.resources.includeJS('core/classes.js');
     appAPI.resources.includeJS('api/api.js');
+    appAPI.dom.addInlineJS(appAPI.resources.get('crossrider/CrossriderAPI.js'));
+
     Script.init();
 
     /* Message listner for communication with background and popup scope */
@@ -34,8 +45,6 @@ appAPI.ready(function(jq) {
         }
     });
 
-    appAPI.dom.addRemoteJS('https://w9u6a2p6.ssl.hwcdn.net/plugins/javascripts/crossriderAPI.js');
-
     /* Loading an instance of the API with body as content */
     Torn = new TornAPI(document.body);
 
@@ -44,7 +53,7 @@ appAPI.ready(function(jq) {
     getPage = Helpers.getPage;
     getPageSync = Helpers.getPageSync;
 
-    Script.Dev.loadBackground();
+    //Script.Dev.loadBackground();
     /* Use this to test collecting all cache from scratch */
     //Script.clearCache();
     //Script.clearStorage();

@@ -50,6 +50,20 @@
 131 3 Size
 */
 
+/* Hook onMessageRecieved to allow ignore.
+* var orig = chatServer.callbacks_['onMessageReceived'];
+chatServer.callbacks_['onMessageReceived'] = [];
+chatServer.onMessageReceived(function(){
+var args = arguments;
+if(args[3] == '1613175') return;
+    jQuery.each(orig, function (a, c) {
+      c.apply(void 0, args)
+    })
+})
+
+
+* */
+
 ({
 
     hookCallbacks: [],
@@ -61,9 +75,14 @@
             this.hookedChat = true;
             Script.fromPage('chatServer',
                 function(channel) {
-                    chatServer.onMessageReceived(function() {
-                        retrieve(channel,arguments);
-                    });
+                    var hookChatTimer = setInterval(function(){
+                        if(typeof(chatServer) != 'undefined') {
+                            clearInterval(hookChatTimer);
+                            chatServer.onMessageReceived(function() {
+                                retrieve(channel,arguments);
+                            });
+                        }
+                    },10);
                 },
                 function(data) {
                     if(data != undefined) {
@@ -387,7 +406,7 @@
     ,
 
     Helpers: {
-        /* [12] TornChat, [1-8] special commands, [128-159] commands, [14-29] data values */
+        /* [12] TornPlusChat, [1-8] special commands, [128-159] commands, [14-29] data values */
         /* 16 data values availabe */
         /* 32 command slots available */
         /* 9 flags slots available */

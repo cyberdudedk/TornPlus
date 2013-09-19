@@ -129,12 +129,10 @@ function crossriderMain(jq) {
         $("#debugtxt").text(str);
     });
     //this.onerror = function(e){alert(e);};
-
     appAPI.message.toActiveTab({action:'getUserId',from:'popup'});
 }
 
 var continueLoad = function(id) {
-
     if(id == null) {
         $('#status').text('Login to Torn and try again');
         return;

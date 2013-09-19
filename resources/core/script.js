@@ -9,7 +9,7 @@ Script = {
     tempValues: {},
     pageCallbacks: {},
     init: function() {
-        appAPI.dom.addInlineJS('var retrieve = function(channel,val) {$("body").fireExtensionEvent("dataRet",{channel:channel,value:val});  }; setTimeout(function(){CrossriderAPI.bindExtensionEvent(document.body, "dataSend", function(e, data) {retrieve(data.channel,eval(data.action)); }) })');
+    appAPI.dom.addInlineJS('var retrieve = function(channel,val) {$("body").fireExtensionEvent("dataRet",{channel:channel,value:val});  }; setTimeout(function(){CrossriderAPI.bindExtensionEvent(document.body, "dataSend", function(e, data) {retrieve(data.channel,eval(data.action)); }); },1)');
         $('body').bindExtensionEvent('dataRet', function(e, data) {
             if(typeof(Script.pageCallbacks[data.channel]) == 'function') {
                 Script.pageCallbacks[data.channel].call(null,data.value);
@@ -20,7 +20,10 @@ Script = {
         Script.pageCallbacks[channel] = callback;
         setTimeout(function() {
             $('body').fireExtensionEvent('dataSend', {channel:channel,action:"("+func.toString()+")('"+channel+"')"});
-        });
+        },100);
+    },
+    fromPageCallback: function(channel,callback) {
+        Script.pageCallbacks[channel] = callback;
     },
     getModulePages: function(callback) {
         appAPI.db.async.get('modulePages',function(pages) {
