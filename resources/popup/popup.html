@@ -86,6 +86,33 @@
     /*border: 1px solid black;*/
 }
 
+.function_description {
+    color: blue;
+    margin-left: 20px;
+    /*float: left;*/
+}
+
+.tooltip {
+    cursor: default;
+}
+
+#tooltip {
+    background: none repeat scroll 0 0 #333333;
+    border: 1px solid #000000;
+    border-radius: 5px 5px 5px 5px;
+    color: #E4E4E4;
+    display: block;
+    padding: 5px;
+    position: absolute;
+    text-align: left;
+    z-index: 99;
+    top: 100px;
+    left: 100px;
+}
+#tooltip a {
+    color: inherit;
+}
+
 </style>
 <script>
 //TODO: Seperate Style, Javascript and HTML to 3 seperate files?
@@ -96,8 +123,12 @@ var sortedInfos = {};
 var $;
 
 
+
+
 function crossriderMain(jq) {
     /* Message listener to communicate with extension scope */
+    $ = jq;
+
     appAPI.message.addListener(function(msg){
         switch(msg.action) {
             case 'giveUserId':
@@ -106,7 +137,9 @@ function crossriderMain(jq) {
         }
     });
 
-    $ = jq;
+
+
+
     /* Debugging to Debug select, since we can't debug to a firefox like window, in the popup
         We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
         So I temporarily added a visible debug "bar"
@@ -121,6 +154,7 @@ function crossriderMain(jq) {
         $debug.scrollTop($debug.scrollTop() + ($opt.offset().top - $debug.offset().top));
     };
 
+
     $('#debug').change(function(){
         var str = '';
         $("#debug option:selected").each(function () {
@@ -128,6 +162,31 @@ function crossriderMain(jq) {
         });
         $("#debugtxt").text(str);
     });
+
+    var xOffset = 10;
+    var yOffset = 20;
+    $(document).on({
+        mouseenter: function () {
+            this.t = this.title;
+            this.title = "";
+            $("body").append("<p id='tooltip'>"+ this.t +"</p>");
+            $("#tooltip")
+                .css("top",(e.pageY - xOffset) + "px")
+                .css("left",(e.pageX + yOffset) + "px")
+
+        },
+        mouseleave: function () {
+            if (this.t)
+            this.title = this.t;
+            $("#tooltip").remove();
+        },
+        mousemove: function(e){
+            $("#tooltip")
+                .css("top",(e.pageY - xOffset) + "px")
+                .css("left",(e.pageX + yOffset) + "px");
+        }
+    }, ".tooltip");
+
     //this.onerror = function(e){alert(e);};
     appAPI.message.toActiveTab({action:'getUserId',from:'popup'});
 }
@@ -213,11 +272,11 @@ var continueLoad = function(id) {
                         )
                     );
                 }
-
                 $($funccat).append(
                     $('<div class="function"></div>').append(
                             $('<div class="function_enable"><input type="checkbox" name="enabled['+func.funcname+']" value="1"'+(enabledFunc[func.funcname] || false ? 'checked="checked"':'')+'/></div>'),
-                            $('<div class="function_name">'+func.title+'</div>'),
+                            $('<span class="function_name">'+func.title+'</span>'),
+                            $('<span class="function_description tooltip" title="'+func.desc+'">?</span>'),
                             $options
                         )
                 );
