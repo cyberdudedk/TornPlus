@@ -71,7 +71,7 @@
     .pages('allpages')
     .category('WIP')
     .desc('Ajaxify Torn makes page loading faster as it doesn\'t need to reload the entire page on each pageview.<br/>Chat no longer needs to reinitialize for every page, and can stay running while navigating. This makes Torn feel 2-3 times faster')
-
+    .on('load')
 
     ,
 
@@ -177,7 +177,8 @@
         $('html head title').text(title);
         $('.tornpluscontent').get(0).innerHTML = html.html();
 
-        this.performAjaxScripts(page,true)
+        this.performAjaxScripts(page,true);
+        Script.run(false);
     },
     performAjax: function(stateObj) {
         var that = this;

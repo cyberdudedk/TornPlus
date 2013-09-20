@@ -4,14 +4,12 @@
         if(!Script.Dev.getDebugMode() && this.enablelocaldev)
         {
             //Enable Debug mode
-            log('enabling debug mode');
             Script.Dev.setPath(this.localwebpath);
             Script.Dev.setDebugMode(true);
         }
         else if(Script.Dev.getDebugMode() && !this.enablelocaldev)
         {
             //Disable Debug mode
-            log('disabling debug mode');
             Script.Dev.setDebugMode(false);
         }
         else if(Script.Dev.getPath() != this.localwebpath) {

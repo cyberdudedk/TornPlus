@@ -65,7 +65,7 @@ appAPI.ready(function(jq) {
     //Only run when we can get the user id
     if(id != null) {
         /* RUN FOREST RUN!!! */
-        Script.run();
+        Script.run(true);
     }
 
 });

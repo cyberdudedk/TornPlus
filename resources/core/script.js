@@ -50,8 +50,8 @@ Script = {
         appAPI.db.async.set('modulePages',pages);
         appAPI.db.async.set('moduleInfos',moduleInfos);
     },
-    run: function(){
-
+    run: function(pageLoad){
+        
         var options = Script.getValue('moduleOptions') || {};
         var enabledFunc = options['enabled'] || {};
         var funcOptions = options['options'] || {};
@@ -77,15 +77,25 @@ Script = {
                             break;
                         }
                     }
-                    if(call != that[mod] && typeof(call) == 'object' && call instanceof Func)                 {
-                        var optValues = call.getDefaults();
-                        $.extend(optValues,funcOptions[pageFunc])
-                        if(optValues != undefined) {
-                            for(var opt in optValues)
-                                call[opt] = optValues[opt];
+                    if(call != that[mod] && typeof(call) == 'object' && call instanceof Func) {
+                        var doRun = false;
+                        if(call._onLoad) {
+                            if(pageLoad) {
+                                doRun = true;
+                            }
+                        } else {
+                            doRun = true;
                         }
-                        call._setModule(module);
-                        call._funct();
+                        if(doRun) {
+                            var optValues = call.getDefaults();
+                            $.extend(optValues,funcOptions[pageFunc])
+                            if(optValues != undefined) {
+                                for(var opt in optValues)
+                                    call[opt] = optValues[opt];
+                            }
+                            call._setModule(module);
+                            call._funct();
+                        }
                     } else
                         log('Failed2 to call ' + pageFunc + ' function');
                 }
@@ -172,11 +182,8 @@ Script = {
             Script._username = name;
             Script._userid = id;
             var users = Script.getRegisteredIds();
-            //if(typeof(users[id]) == 'undefined')
-            //{
-                users[id] = name;
-                appAPI.db.set('users',users);
-            //}
+            users[id] = name;
+            appAPI.db.set('users',users);
         }
         return id;
     },
@@ -208,7 +215,6 @@ Script = {
     },
     loadModule: function(mod) {
         var module = eval(appAPI.resources.get('modules/'+mod+'.js'));
-        //appAPI.resources.includeJS('modules/'+mod+'.js'); //In background scope probably eval .get is needed, but hack might still apply
         this.loadedModules[mod] = module;
         return module;
     },

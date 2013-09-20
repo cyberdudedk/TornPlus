@@ -18,7 +18,8 @@
 /* Base wrapper class for module functions */
 Func = function(title,f) {
     this.module = {};
-
+    this._onLoad = false;
+    
     this._setModule = function(mod) {
         this.module = mod;
         return this;
@@ -59,6 +60,24 @@ Func = function(title,f) {
         this._title = title;
         return this;
     }
+
+    this.on = function(onAction) {
+        if(typeof(onAction) != 'array') onAction = [onAction];
+        this._on = onAction;
+
+        for(var i in onAction) {
+            var act = onAction[i];
+            switch(act) {
+                case 'load':
+                    this._onLoad = true;
+                break;
+            }
+        }
+
+        return this;
+    }
+
+
     
     this.getDefaults = function() {
         var def = {};
