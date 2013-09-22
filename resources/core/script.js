@@ -59,10 +59,10 @@ Script = {
         var call, func, typ, fId;        
         var pages = this.getModulePages(function(pages) {
             var page = location.pathname.substring(location.pathname.lastIndexOf('/')+1).split('.')[0];
-            var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1));
             var pageFuncs = (pages["allpages"] || []).concat(pages[page] || []);
             for(var f in pageFuncs) {
-                var pageFunc = pageFuncs[f];
+                var pageFunc = pageFuncs[f].funcName;
+                
                 if(enabledFunc[pageFunc] == true) {
                     var arr = pageFunc.split('/');
                     var mod = arr.shift();
@@ -78,23 +78,49 @@ Script = {
                         }
                     }
                     if(call != that[mod] && typeof(call) == 'object' && call instanceof Func) {
-                        var doRun = false;
-                        if(call._onLoad) {
-                            if(pageLoad) {
-                                doRun = true;
-                            }
-                        } else {
-                            doRun = true;
-                        }
+                        var doRun = true;
+                        if(call._onLoad && !pageLoad) doRun = false;
+
                         if(doRun) {
-                            var optValues = call.getDefaults();
-                            $.extend(optValues,funcOptions[pageFunc])
-                            if(optValues != undefined) {
-                                for(var opt in optValues)
-                                    call[opt] = optValues[opt];
+                            var conditionsMet = false;
+                            var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1),true);
+                            var conditions = pageFuncs[f].conditions;
+                            if(conditions === null && qs === null) conditionsMet = true;
+                            else if(conditions !== null) {
+                                if(qs == null) qs = {};
+
+                                var checkConditions = function(conditions,qs) {
+                                    var conditionsMet = true;
+                                    for(var conKey in conditions) {
+                                        conditionsMet = ((qs[conKey] == conditions[conKey]) && conditionsMet);
+                                    }
+                                    return conditionsMet;
+                                }
+                                
+                                if(Array.isArray(conditions)) {
+                                    //Multiple OR array
+                                    conditionsMet = false;
+                                    for(var i in conditions) {
+                                            conditionsMet = conditionsMet || checkConditions(conditions[i],qs);
+                                    }
+
+                                } else {
+                                    //AND object
+                                    conditionsMet = checkConditions(conditions,qs);
+                                }
                             }
-                            call._setModule(module);
-                            call._funct();
+
+                            if(conditionsMet == true)
+                            {
+                                var optValues = call.getDefaults();
+                                $.extend(optValues,funcOptions[pageFunc])
+                                if(optValues != undefined) {
+                                    for(var opt in optValues)
+                                        call[opt] = optValues[opt];
+                                }
+                                call._setModule(module);
+                                call._funct();
+                            }
                         }
                     } else
                         log('Failed2 to call ' + pageFunc + ' function');
@@ -108,13 +134,20 @@ Script = {
                 var funcName = modname + "/" + modFunc;
                 var func = mod[modFunc];
                 if(mod[modFunc] instanceof Func) {
-                    pages = func._pages || [];
-                    if(typeof(pages) == 'string') pages = [pages];
+                    tempPages = func._pages || [];
+                    var pages = {};
+                    if(typeof(tempPages) == 'string') pages[tempPages] = {};
+                    else if(Array.isArray(tempPages)) {
+                        for(var i in tempPages) pages[tempPages[i]] = {};
+                    }
+                    else pages = tempPages;
+                    
                     for(pageId in pages) {
                         page = pages[pageId];
-                        if(this.modulePages[page] == undefined) this.modulePages[page] = [];
-                        this.modulePages[page].push(funcName);
+                        if(this.modulePages[pageId] == undefined) this.modulePages[pageId] = [];
+                        this.modulePages[pageId].push({funcName:funcName,conditions:page});
                     }
+
                     var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':func._options};
                     this.moduleInfos[funcName] = obj;
                 }

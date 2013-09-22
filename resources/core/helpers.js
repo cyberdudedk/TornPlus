@@ -7,8 +7,11 @@ Utils = {
         if((m = str.match(/^[\s\S]*?\$?(([\d]*?,?)*[\d]*?[.]?[\d]+)[^\d]*?$/m)) == undefined) return undefined;
         return Number(m[1].replace(/,/g,'')); //Extract integer or float value
     },
-    querystringToObject: function(query) {
-        if (query == '' || typeof(query) == 'undefined') return {};
+    querystringToObject: function(query, emptyAsNull) {
+        if (query == '' || typeof(query) == 'undefined') {
+            if(typeof(emptyAsNull) == 'undefined' || emptyAsNull == false) return {};
+            else return null;
+        }
         var obj = {};
         var vars = query.split("&");
         for (var i = 0; i < vars.length; i++) {

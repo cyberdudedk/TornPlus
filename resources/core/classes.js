@@ -25,7 +25,7 @@ Func = function(title,f) {
         return this;
     }
 
-    this.pages = function(pages) {
+    this.pages = function(pages,params) {
         this._pages = pages;
         return this;
     }
