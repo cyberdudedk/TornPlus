@@ -223,7 +223,7 @@
             return function(){};
         }
     },
-    /* TODO: Fill out more scripts. These are scripts either from Torn, some with minor modifactions, or replica. */
+    /* TODO: Fill out more scripts. These are scripts either from Torn (Chedburn Networks Code), some with minor modifactions, or replica. */
     extraScripts: function() {
         increment = function(textboxID) {
             var textboxToChange = document.getElementById(textboxID);

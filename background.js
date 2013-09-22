@@ -6,7 +6,7 @@ appAPI.ready(function($) {
         resourcePath:'popup/popup.html',
         width: 700,
         height: 600
-    }); 
+    });
     /* getActive only supported on Chrome currently
         setActive only supported on FF and Chrome currently
         ETA for these two is said to within 1 month (Which is almost up).

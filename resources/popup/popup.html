@@ -325,7 +325,7 @@ var continueLoad = function(id) {
             var named = this.name.replace(/\[([^\]]+)?\]/g, ',$1').split(',');
             var cap = named.length - 1;
             var $el = $(this);
-            if ( named[ 0 ] ) {
+            if(named[0]) {
                 for(var i = 0;i < cap;i++) {
                     lookup = lookup[named[i]] = lookup[named[i]] || (named[i+1] === "" ? [] : {});
                 }
