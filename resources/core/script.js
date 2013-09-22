@@ -83,9 +83,9 @@ Script = {
 
                         if(doRun) {
                             var conditionsMet = false;
-                            var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1),true);
+                            var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1));
                             var conditions = pageFuncs[f].conditions;
-                            if(conditions === null && qs === null) conditionsMet = true;
+                            if(conditions === null && $.isEmptyObject(qs) == true) conditionsMet = true;
                             else if(conditions !== null) {
                                 if(qs == null) qs = {};
 
@@ -119,7 +119,7 @@ Script = {
                                         call[opt] = optValues[opt];
                                 }
                                 call._setModule(module);
-                                call._funct();
+                                call._funct(qs);
                             }
                         }
                     } else
