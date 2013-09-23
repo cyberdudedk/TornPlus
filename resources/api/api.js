@@ -116,20 +116,72 @@ TornAPI = function(p) {
 
             },
             racing: {
-                getHeader: function() {
-                    return self.ui.content().filter('table:first');
+                cars: {
+                    getHeader: function() {
+                        return self.ui.content().filter('table:first');
+                    },
+                    getCars: function() {
+                        return self.ui.content().filter('table:gt(0)');
+                    }
                 },
-                getCars: function() {
-                    return self.ui.content().filter('table:gt(0)');
+                front: {
+                    racingupdates: {
+                        getCar: function() {
+                            return self.ui.content().filter('#racingupdates').find('table:eq(4)');
+                        }
+                    }
+                },
+                parts: {
+                    cars: {
+                        getCars: function() {
+                            return self.ui.content().filter('table:last').find('> tbody > tr > td > table');
+                        }
+                    },
+                    upgrades: {
+                        getUpgrades: function() {
+                            return self.ui.content().filter('table:last').find('> tbody > tr > td > table');
+                        }
+                    }
+
                 }
+
             },
             gym: {
                 getInfo: function() {
                     return $('#gymExpTabs',page);
+                },
+                getStatBoxes: function() {
+                    return $('.gymStatBox');
+                }
+            },
+            blacklist: {
+                table: {
+                    getHeader: function() {
+                        return self.ui.content().filter('.data').find('thead tr');
+                    },
+                    getRows: function() {
+                        return self.ui.content().filter('.data').find(' tbody tr');
+                    }
                 }
             },
             crimes: function() {
 
+            },
+            stock: {
+                portfolio: {
+                    getStockRows: function() {
+                        var rows = [];
+                        self.ui.content().filter('table').find('tr:nth-child(7n+3)').each(function(){
+                            rows.push($(this).closest("tr").nextAll().andSelf().slice(0, 4));
+                        });
+                        return rows;
+                    }
+                },
+                profile: {
+                    getPriceTable: function() {
+                        return self.ui.content().filter('table').find('tr tr table:eq(1)');
+                    }
+                }
             }
             /* TODO: More */
         },
@@ -565,8 +617,8 @@ TornAPI = function(p) {
                     var carsRegex = /([^\r\n\s][\s\S]*?): ([\s\S]+)/m;
                     if(!self.user.unlockables.hasRacing()) return stats;
                     var page = getPageSync('racing',{step:'cars'});
-                    var header = page.ui.pageContent.racing.getHeader();
-                    var carsTabels = page.ui.pageContent.racing.getCars();
+                    var header = page.ui.pageContent.racing.cars.getHeader();
+                    var carsTabels = page.ui.pageContent.racing.cars.getCars();
                     stats['class'] = 'None';
                     stats['skill'] = Utils.number(header.find('table font:last').text());
                     stats['class'] = header.find('td:last img').attr('title').slice(-1);
