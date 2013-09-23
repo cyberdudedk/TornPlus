@@ -4,8 +4,39 @@ Utils = {
     number: function(str) {
         var m;
         if(str == undefined) return undefined;
+        if(typeof(str) == 'number') return str;
         if((m = str.match(/^[\s\S]*?\$?(([\d]*?,?)*[\d]*?[.]?[\d]+)[^\d]*?$/m)) == undefined) return undefined;
         return Number(m[1].replace(/,/g,'')); //Extract integer or float value
+    },
+    tornNumber: function(num,dec) {
+        return Utils.addThousands(Utils.round(num,dec));
+    },
+    round: function(n,dec) {
+        n = parseFloat(n);
+        if(!isNaN(n)){
+            if(!dec) var dec= 0;
+            var factor= Math.pow(10,dec);
+            return Math.floor(n*factor+((n*factor*10)%10>=5?1:0))/factor;
+        }else{
+            return n;
+        }
+    },
+    addThousands: function(num)
+    {
+        var numStr = num + "";
+        var neg = false;
+        if(numStr.indexOf('-') == 0) {
+            neg = true;
+            numStr = numStr.substring(1);
+        }
+
+        var spl = numStr.split('.');
+        var nt = spl[0];
+        var nmod = ((nt.length-1) % 3)+1;
+        return (neg ? '-' : '') + nt.substring(0,nmod) + (nmod != nt.length ? ',' + nt.substring(nmod).match(/.{3}/g).join(',') : '') + (spl[1] ? '.' + spl[1] : '');
+    },
+    percent: function(value, divisor) {
+        return ((value / divisor)*100).toFixed(2) + "%";
     },
     querystringToObject: function(query, emptyAsNull) {
         if (query == '' || typeof(query) == 'undefined') {

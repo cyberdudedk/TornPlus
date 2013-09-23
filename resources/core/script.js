@@ -62,7 +62,6 @@ Script = {
             var pageFuncs = (pages["allpages"] || []).concat(pages[page] || []);
             for(var f in pageFuncs) {
                 var pageFunc = pageFuncs[f].funcName;
-                
                 if(enabledFunc[pageFunc] == true) {
                     var arr = pageFunc.split('/');
                     var mod = arr.shift();
@@ -80,16 +79,19 @@ Script = {
                     if(call != that[mod] && typeof(call) == 'object' && call instanceof Func) {
                         var doRun = true;
                         if(call._onLoad && !pageLoad) doRun = false;
-
                         if(doRun) {
                             var conditionsMet = false;
                             var qs = Utils.querystringToObject(location.search.substring(location.search.indexOf('?')+1));
                             var conditions = pageFuncs[f].conditions;
+
                             if(conditions === null && $.isEmptyObject(qs) == true) conditionsMet = true;
                             else if(conditions !== null) {
                                 if(qs == null) qs = {};
 
                                 var checkConditions = function(conditions,qs) {
+                                    if(conditions == null) {
+                                        return ($.isEmptyObject(qs) == true);
+                                    }
                                     var conditionsMet = true;
                                     for(var conKey in conditions) {
                                         conditionsMet = ((qs[conKey] == conditions[conKey]) && conditionsMet);
@@ -101,7 +103,7 @@ Script = {
                                     //Multiple OR array
                                     conditionsMet = false;
                                     for(var i in conditions) {
-                                            conditionsMet = conditionsMet || checkConditions(conditions[i],qs);
+                                        conditionsMet = conditionsMet || checkConditions(conditions[i],qs);
                                     }
 
                                 } else {
@@ -119,7 +121,7 @@ Script = {
                                         call[opt] = optValues[opt];
                                 }
                                 call._setModule(module);
-                                call._funct(qs);
+                                call._funct(page,qs);
                             }
                         }
                     } else
@@ -143,11 +145,12 @@ Script = {
                     else pages = tempPages;
                     
                     for(pageId in pages) {
+
                         page = pages[pageId];
+
                         if(this.modulePages[pageId] == undefined) this.modulePages[pageId] = [];
                         this.modulePages[pageId].push({funcName:funcName,conditions:page});
                     }
-
                     var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':func._options};
                     this.moduleInfos[funcName] = obj;
                 }
