@@ -9,12 +9,22 @@ Script = {
     tempValues: {},
     pageCallbacks: {},
     init: function() {
-    appAPI.dom.addInlineJS('var retrieve = function(channel,val) {$("body").fireExtensionEvent("dataRet",{channel:channel,value:val});  }; setTimeout(function(){CrossriderAPI.bindExtensionEvent(document.body, "dataSend", function(e, data) {retrieve(data.channel,eval(data.action)); }); },1)');
+        $("#announce").parent().after('<div id="noticebarwrapper"><div id="noticebarouter"><div id="noticebar"></div></div></div>');
+        $(document).on('scroll',function(e) {
+            if($(this).scrollTop() > 50) {
+                if(!$('#noticebarwrapper').hasClass('fixed'))
+                    $('#noticebarwrapper').addClass('fixed');
+            } else {
+                $('#noticebarwrapper').removeClass('fixed');
+            }
+        });
+        appAPI.dom.addInlineJS('var retrieve = function(channel,val) {$("body").fireExtensionEvent("dataRet",{channel:channel,value:val});  }; setTimeout(function(){CrossriderAPI.bindExtensionEvent(document.body, "dataSend", function(e, data) {retrieve(data.channel,eval(data.action)); }); },1)');
         $('body').bindExtensionEvent('dataRet', function(e, data) {
             if(typeof(Script.pageCallbacks[data.channel]) == 'function') {
                 Script.pageCallbacks[data.channel].call(null,data.value);
             }
         });
+        
     },
     fromPage: function(channel,func,callback) {
         Script.pageCallbacks[channel] = callback;

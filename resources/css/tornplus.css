@@ -1,0 +1,47 @@
+#noticebar {
+    border:1px solid green;
+    background-color:lightGreen;
+    color:black;
+    font-size: 14px;
+    z-index: 1000;
+    float: left;
+    display: block;
+    width: 90%;
+    margin-right: 4%;
+    margin-left: 5%;
+    display: none;
+}
+
+#noticebar.show {
+    display: block;
+}
+
+#noticebarwrapper.fixed {
+    position: fixed;
+    top: 0px;
+}
+
+#noticebarwrapper {
+    width: 100%;
+    position: absolute;
+}
+
+#noticebarouter {
+    margin-left: 192px;
+}
+
+.noticemsg {
+    
+}
+
+.noticemsg.good {
+    background-color:lightGreen;
+}
+
+.noticemsg.bad {
+    background-color:lightCoral;
+}
+
+.noticemsg.info {
+    background-color:lightSkyBlue;
+}

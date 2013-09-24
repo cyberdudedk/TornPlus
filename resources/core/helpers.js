@@ -107,6 +107,10 @@ Utils = {
     },
     br2nl: function (str) {
         return str.replace(/<br\s*\/?>/mg,"\n");
+    },
+    getFullTimestamp: function()
+    {
+        return Math.round(+new Date());
     }
 
 };
@@ -178,6 +182,40 @@ Helpers = {
             page = new TornAPI(Utils.getCleanHtml(data));
         }});
         return page;
+    },
+    postPageSync: function(url, postData) {
+        $.ajax({url:url,type:'POST',async:false,data:postData,success:function(data){
+            page = new TornAPI(Utils.getCleanHtml(data));
+        }});
+        return page;
+    },
+    notice: function(msg,type) {
+        if(typeof(type) == 'undefined') type = 'info';
+        $('#noticebar').addClass('show');
+        if(!noticeIds[type]) {
+            noticeIds[type] = {};
+        }
+        var ts;
+        if(!noticeIds[type][msg]) {
+            ts = Utils.getFullTimestamp()
+            noticeIds[type][msg] = ts;
+            noticeCounts[ts] = 1;
+            var msgObj = $('<div id="noticemsg_'+ts+'" class="noticemsg '+type+'"><span class="noticecount"></span>'+msg+'</div>');
+            $('#noticebar').append(msgObj);
+        } else {
+            ts = noticeIds[type][msg];
+            noticeCounts[ts]+=1;
+            $('#noticemsg_' + ts + ' .noticecount').text(noticeCounts[ts] + 'x ');
+        }
+
+        clearTimeout(noticeTimer);
+        noticeTimer = setTimeout(function(){
+            noticeIds = {};
+            noticeCounts = {};
+            $('#noticebar').html('');
+            $('#noticebar').removeClass('show');
+        },5000);
+
     }
 };
 
