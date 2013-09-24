@@ -11,7 +11,7 @@ TODO List
 /* Short term TODO List
 *
 * */
-var devFiles = ['chat','ajaxify','ui','stocks'];
+var devFiles = ['chat','ajaxify','ui','stocks','gym'];
 
 var $, Torn, cachedValue, getPage, getPageSync, postPageSync, notice, noticeTimer, noticeIds = {}, noticeCounts = {};
 

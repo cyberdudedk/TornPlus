@@ -1,5 +1,5 @@
 ({
-    stockblockcost: new Func('Block Cost',function(page,qs){
+    stockblockcost: new Func('Stock Block Cost',function(page,qs){
         var blockshares = {1:4000000,2:1500000,3:3000000,4:1500000,5:3000000,6:500000,
         7:150000,8:1000000,9:125000,10:5000000,11:300000,12:6000000,13:1000000,14:100000,
         15:2000000,16:500000,17:100000,18:1500000,19:2000000,20:1000000,21:5000000,22:1500000,
@@ -7,11 +7,9 @@
 
         var blocknum = blockshares[qs.stock];
         if(blocknum) {
-            var tbl = Torn.ui.pageContent.stock.profile.getPriceTable();
-            log(tbl);
             var price = Utils.number(tbl.find('tr:eq(0)').text());
             var blockprice = Utils.tornNumber(blocknum * price);
-            tbl.append('<tr><td colspan="2"><hr width="100%"></td></tr><tr><td><b>Block cost:</b></td><td>$'+blockprice+'</td></tr>');
+            Torn.ui.pageContent.stock.profile.getPriceTable().append('<tr><td colspan="2"><hr width="100%"></td></tr><tr><td><b>Block cost:</b></td><td>$'+blockprice+'</td></tr>');
         }
     })
     .desc('Show the price of benefit blocks in the stock market')

@@ -39,6 +39,18 @@
 
     ,
 
+    battlestatround: new Func("Round battlestat on Home", function(){
+        Torn.ui.pageContent.home.getBoxes()['Battle Stats'].find('tr b').each(function(){
+            $(this).text(Utils.tornNumber(Utils.round(Utils.number($(this).text()),0)));
+        });
+    })
+    .category('UI')
+    .desc("Round the battlestat on Home page to nearest whole number")
+    .pages('index')
+
+    ,
+    
+
     battlestatpercentage: new Func("Show percentage on battle stats", function(page){
         if(page == 'index') {
             var stats = Torn.ui.pageContent.home.getBoxes()['Battle Stats'].find('tr b');
@@ -48,7 +60,7 @@
             });
         } else if (page == 'gym') {
             var total = 0;
-            var boxes = Torn.ui.pageContent.gym.getStatBoxes();
+            var boxes = Torn.ui.pageContent.gym.getStatBoxes().find('.gymStatBox');
             boxes.each(function(){total += Utils.number($(this).text())});
             boxes.each(function(){
                 var text = $(this).text();
@@ -117,6 +129,17 @@
     .category('UI')
     .desc("Show numbers besides specs bars on racing pages")
     .pages({'racing':[null,{step:'cars'},{step:'parts'},{step:'parts3'}]})
+
+    ,
+
+    taglisthover: new Func("Last activity when hovering Tag list", function(){
+        Torn.ui.navigation.tagList().mouseover(function(){
+            $(this).attr('title','Last Active: ' + Torn.player(Utils.number($(this).find('a.button').attr('href'))).profile()['Last action']);
+        });
+    })
+    .category('UI')
+    .desc("Hover mouse over a profile in Tag List to see Last Activity")
+    .pages('allpages')
 
 
 })
