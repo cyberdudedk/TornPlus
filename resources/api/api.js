@@ -32,12 +32,17 @@ TornAPI = function(p) {
             },
             iconInfo: function() {
                 return $('#iconTray',self.ui.navigation.info());
+            },
+            tagList: function() {
+                return self.ui.navigation.specials().find("li:contains('Tag List')").nextAll();
             }
         },
         banner: function() {
             return $('#banner');
         },
         content: function(){
+            var obj = page.find('.tornpluscontent');
+            if(obj.size() > 0) page = obj;
             return $('> div > table:not(#announce) > tbody > tr > td:last',page).contents().filter(function(){return this.nodeType == 1 || (this.nodeType == 3 && this.textContent.trim() != '');});
         },
 
@@ -151,7 +156,7 @@ TornAPI = function(p) {
                     return $('#gymExpTabs',page);
                 },
                 getStatBoxes: function() {
-                    return $('.gymStatBox');
+                    return $('.gymSubBoxLeft, .gymSubBoxRight',self.ui.content());
                 }
             },
             blacklist: {
@@ -182,6 +187,31 @@ TornAPI = function(p) {
                         return self.ui.content().filter('table').find('tr tr table:eq(1)');
                     }
                 }
+            },
+            profiles: {
+                getWrapper: function() {
+                    return $('.profileWrapper',self.ui.content());
+                },
+                getBasicInfo: function() {
+                    return $('#basicInfo',self.ui.pageContent.profiles.getWrapper());
+                },
+                getInfobox: function() {
+                    return $('#infoBoxLeft',self.ui.pageContent.profiles.getWrapper());
+                }
+
+            },
+            hospital: {
+                getTable: function() {
+                    return $('.data:eq(1)',self.ui.content());
+                },
+                getRows: function() {
+                    return $('.data:eq(1) tbody tr',self.ui.content());
+                },
+                revive: {
+                    getMessage: function() {
+                        return $('center',self.ui.content());
+                    }
+                }
             }
             /* TODO: More */
         },
@@ -191,7 +221,98 @@ TornAPI = function(p) {
 
         }
     };
-    
+
+    this.player = function(id) {
+        var _playerid = id;
+        var _profilePage;
+        
+        return {
+            id: function() {
+                return _playerid;
+            },
+            name: function() {
+                return this.profile()['Name'];
+            },
+            profilePage: function() {
+                if(typeof(this._profilePage) == 'undefined') {
+                    this._profilePage = getPageSync('profiles',{XID:_playerid});
+                }
+                return this._profilePage;
+            },
+            detailedPage: function(personal) {
+                if(typeof(personal) == 'undefined') personal = false;
+                if(typeof(this._detailedPage) == 'undefined') {
+                    if(personal) this._detailedPage = getPageSync('personalstats');
+                    else this._detailedPage = getPageSync('personalstats',{ID:_playerid});
+                }
+                return this._detailedPage;
+            },
+            profile: function() {
+                var values = {};
+                var page = this.profilePage();
+                var basicInfo = page.ui.pageContent.profiles.getBasicInfo();
+                var infoBoxLeft = page.ui.pageContent.profiles.getInfobox();
+
+                values['Level'] = Utils.number($('.statBox font.level a font',basicInfo).text());
+                values['Rank'] = $('.statBox a span.rankSmall',basicInfo).text();
+                values['Title'] = $('.statBox > span.rankSmall',basicInfo).text();
+                values['Age'] = Utils.number($('.statBoxN',basicInfo).textOnly().trim());
+
+                infoBoxLeft.find('table').remove().end().children().last().remove().end().end().html().split('<br>').forEach(function(v,i) {
+                    var spl = $('<p>'+v+'</p>').text().trim().split(': ',2);
+                    /* TODO: Add more! */
+                    switch(spl[0]) {
+                        case 'Faction':
+                            var factiona = $(v).filter('a');
+                            if(factiona.size() > 0) {
+                                values['Faction'] = {id: Utils.number(factiona.attr('href')), name:spl[1]};
+                            }
+                        break;
+                        case 'Online':
+                            values['Online'] = spl[1] == 'Online';
+                        break;
+                        case 'Name':
+                            values['Name'] = spl[1].split(' ')[0];
+                        break;
+                        default:
+                            values[spl[0]] = spl[1];
+                        break;
+                    }
+                });
+
+                return values;
+            },
+            detailed: function(personal) {
+                var match,
+                    myregexp = /(\d*)([dhms])/g,
+                    stats = {},
+                    curheader,
+                    convert = function(val) {
+                        var totalSec = 0;
+                        var multi = {s:1, m:60, h:3600, d:86400};
+                        val = val.replace(/[$,]| \([\d\.]*[%s]\)/g,'');
+                        var num = Number(val);
+                        if(!isNaN(num)) return num;
+                        while ((match = myregexp.exec(val)) != null) {
+                            totalSec += (multi[match[2]] * Number(match[1]));
+                        }
+                        return totalSec;
+                    };
+
+                    this.detailedPage(personal).ui.pageContent.personalstats.getRows().each(function(){
+                        if($(this).find('td').size() == 1) {
+                            curheader = $(this).find('td b').text();
+                            stats[curheader] = {};
+                        }else {
+                            stats[curheader][$(this).find('td:eq(0)').text().slice(0,-1)] = convert($(this).find('td:eq(1)').text());
+                        }
+                    });
+                    return stats;
+            }
+
+        }
+    }
+
     this.user = {
         id: function() {
             return Script.userId();
@@ -201,31 +322,7 @@ TornAPI = function(p) {
         },
         profile: function() {
             return cachedValue('user/profile',function() {
-                var values = {};
-                var page = getPageSync('profiles',{XID:self.user.id()});
-                var wrapper = $('.profileWrapper',page.ui.content());
-                var basicInfo = $('#basicInfo',wrapper);
-                var infoBoxLeft = $('#infoBoxLeft',wrapper);
-                
-                values['level'] = $('.statBox font.level a font',basicInfo).text();
-                values['rank'] = $('.statBox a span.rankSmall',basicInfo).text();
-                values['title'] = $('.statBox > span.rankSmall',basicInfo).text();
-                values['age'] = $('.statBoxN',basicInfo).textOnly().trim();
-                
-                infoBoxLeft.find('table').remove().end().children().last().remove().end().end().html().split('<br>').forEach(function(v,i) {
-                    var spl = $('<p>'+v+'</p>').text().trim().split(': ',2);
-                    //Currently only using faction, maybe add more later
-                    switch(spl[0]) {
-                        case 'Faction':
-                            var factiona = $(v).filter('a');
-                            if(factiona.size() > 0) {
-                                values['faction'] = {id: Utils.number(factiona.attr('href')), name:spl[1]};    
-                            }
-                        break;
-                    }
-                });
-                
-                return values;
+                return self.player(self.user.id()).profile();
             });
         },
         homeInfo: function() {
@@ -345,7 +442,7 @@ TornAPI = function(p) {
 
         faction: {
             info: function() {
-                return self.user.profile().faction;
+                return self.user.profile().Faction;
             },
             id: function() {
                 return self.user.faction.info().id;
@@ -583,31 +680,7 @@ TornAPI = function(p) {
             },
             detailed: function() {
                 return cachedValue('user/stats/detailed',function() {
-                    var match,
-                    myregexp = /(\d*)([dhms])/g,
-                    stats = {},
-                    curheader,
-                    convert = function(val) {
-                        var totalSec = 0;
-                        var multi = {s:1, m:60, h:3600, d:86400};
-                        val = val.replace(/[$,]| \([\d\.]*[%s]\)/g,'');
-                        var num = Number(val);
-                        if(!isNaN(num)) return num;
-                        while ((match = myregexp.exec(val)) != null) {
-                            totalSec += (multi[match[2]] * Number(match[1]));
-                        }
-                        return totalSec;
-                    };
-
-                    getPageSync('personalstats').ui.pageContent.personalstats.getRows().each(function(){
-                        if($(this).find('td').size() == 1) {
-                            curheader = $(this).find('td b').text();
-                            stats[curheader] = {};
-                        }else {
-                            stats[curheader][$(this).find('td:eq(0)').text().slice(0,-1)] = convert($(this).find('td:eq(1)').text());
-                        }
-                    });
-                    return stats;
+                    return self.player(self.user.id()).detailed(true);
                 });
             },
             racing: function() {
@@ -654,8 +727,17 @@ TornAPI = function(p) {
                         var lis = $(gymInfo).find('#tabs-'+gym+' li');
                         gymStat[gymClass[gym]] = {max:lis.size(),unlocked:lis.filter('.active, .enter').size()};
                     }
+                    var currentName = $('.active .name',gymInfo).text();
+                    var spl = $('#disableStats',gymInfo).text().split(', ');
+                    gymStat['Current'] = {'name':currentName,
+                        gains:{
+                            Strength:Utils.number(spl[0])*2,
+                            Speed:Utils.number(spl[1])*2,
+                            Defense:Utils.number(spl[2])*2,
+                            Dexterity:Utils.number(spl[3])*2
+                        }};
                     return gymStat;
-                });
+                },0);
             },
             poker: function() {
                 return cachedValue('user/stats/poker',function(){
@@ -747,6 +829,10 @@ TornAPI = function(p) {
                 });
             }
 
+        },
+
+        gym: function() {
+            return self.user.stats.gym()['Current'];
         }
 
     };
