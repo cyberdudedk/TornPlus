@@ -114,11 +114,23 @@ TornAPI = function(p) {
                     return self.ui.content().find('.data tbody tr');
                 }
             },
-            jail: function() {
+            jail: {
+                getRows: function() {
+                    return self.ui.content().find('.data:eq(1) tbody tr');
+                },
+                getMessageContent: function() {
+                    return self.ui.content().filter('font:last');
+                },
+                getBustMessage: function() {
+                    return self.ui.pageContent.jail.getMessageContent().text().replace(/>\s*(Back)?/g, "").trim();
+                },
+                getBailMessage: function() {
+                    return self.ui.pageContent.jail.getMessageContent().text().replace(/>\s*(Back)?/g, "").trim();
+                },
+                getBailYesButton: function() {
+                    return self.ui.pageContent.jail.getMessageContent().find('td a:first');
 
-            },
-            hospital: function() {
-
+                }
             },
             racing: {
                 cars: {
@@ -209,7 +221,7 @@ TornAPI = function(p) {
                 },
                 revive: {
                     getMessage: function() {
-                        return $('center',self.ui.content());
+                        return $('center',self.ui.content()).text();
                     }
                 }
             }
@@ -510,10 +522,36 @@ TornAPI = function(p) {
                 },
                 hospital: function() {
 
+                },
+                bail: function() {
+                    var bails = [];
+                    self.user.perks.education().forEach(function(v){
+                        if(v.indexOf('Bail Cost') > -1)
+                            bails.push(v);
+                    });
+                    return bails;
                 }
                 /* TODO: More perks */
 
 
+            },
+            byResult: {
+                bail: function() {
+                    var totalPercent = 1;
+                    var bails = self.user.perks.byEffect.bail();
+
+                    bails.forEach(function(v){
+                        totalPercent = totalPercent * ((100 - Utils.number(v))/100.0);
+                    });
+                    
+                    /* TODO: Fix, due to Bug (Wrong Perk text), the Perk text has added Perks,
+                    e.g 10% + 5% = 15%. However in reality the perks is stacked, thus 10%+5% = 14.5% reduction
+                    Bug reported here: http://www.torn.com/forums.php?forumID=19&ID=15718385
+                    */
+                    if(totalPercent == 0.85) totalPercent = 0.855 /* TODO: Temp fix */
+                    if(totalPercent == 0.65) totalPercent = 0.78625 /* TODO: Temp fix */
+                    return totalPercent;
+                }
             }
         },
 

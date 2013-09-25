@@ -7,9 +7,10 @@
 
         var blocknum = blockshares[qs.stock];
         if(blocknum) {
+            var tbl = Torn.ui.pageContent.stock.profile.getPriceTable()
             var price = Utils.number(tbl.find('tr:eq(0)').text());
             var blockprice = Utils.tornNumber(blocknum * price);
-            Torn.ui.pageContent.stock.profile.getPriceTable().append('<tr><td colspan="2"><hr width="100%"></td></tr><tr><td><b>Block cost:</b></td><td>$'+blockprice+'</td></tr>');
+            tbl.append('<tr><td colspan="2"><hr width="100%"></td></tr><tr><td><b>Block cost:</b></td><td>$'+blockprice+'</td></tr>');
         }
     })
     .desc('Show the price of benefit blocks in the stock market')

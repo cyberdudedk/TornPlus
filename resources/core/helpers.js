@@ -100,6 +100,7 @@ Utils = {
             $(this).attr('origsrc',$(this).attr('src'));
             $(this).attr('src','');
         });
+        html.find('script').remove();
         return html;
     },
     endsWith: function(str,suffix) {
