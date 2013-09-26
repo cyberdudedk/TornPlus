@@ -232,10 +232,19 @@ jQuery.fn.textOnly = function() {
     jQuery.fn.attr = function(){
         if(arguments.length == 1 && arguments[0] == 'src') {
             var val = originalAttrMethod.apply( this, ['origsrc'] );
-            if(typeof(val) == 'undefined' || val === false)
+            if(typeof(val) == 'undefined' || val === false){
                 val = originalAttrMethod.apply( this, ['src'] );
+            }
+
             return val;
         } else
             return originalAttrMethod.apply( this, arguments );
     }
 })();
+
+jQuery.fn.enableImgs = function() {
+    $(this).find('img').each(function(){
+        $(this).attr('src',$(this).attr('origsrc'));
+    });
+    return $(this);
+}

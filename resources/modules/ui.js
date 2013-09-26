@@ -141,5 +141,71 @@
     .desc("Hover mouse over a profile in Tag List to see Last Activity")
     .pages('allpages')
 
+    ,
+
+    showinfoiconstext: new Func("Show Info Icons text (Expand Info Icons)",function() {
+        var icontray = Torn.ui.navigation.iconInfo(),
+        infoIcons = this.module.getInfoIcons(),
+        that = this;
+        var keyTranslate = {Female:'Gender',Male:'Gender'};
+
+        if(icontray.size() > 0) {
+            var newtray = $('<ul></ul>').attr('id','iconTraynew').addClass('big').insertAfter(icontray);
+            icontray.find('.iconShow').each(function(){
+                var spl = $(this).attr('title').split('</b>'),
+                name = spl[0].replace('<b>',''),
+                text = spl[1].replace(/<br>/g,' ').trim() || name;
+                name = keyTranslate[name] || name;
+                if(infoIcons[name] && that[infoIcons[name]]) {
+                    $('<span></span>').addClass('iconSpan').html(that.module.shortInfoText(name,text))
+                        .insertAfter($(this).appendTo(newtray)).after('<br style="clear:both;"/>');
+                }
+            });
+        }
+    })
+    .pages('allpages')
+    .category('UI')
+    .desc('Expand Info (Navigation) Icons show you can see the Text without having to hover')
+    .options(function(){
+            var infoIcons = this.getInfoIcons(),
+            options = [];
+            for(var k in infoIcons)
+                options.push(new Option(infoIcons[k],'boolean',false));
+            return options;
+    })
+
+    ,
+
+    getInfoIcons: function() {
+        //TODO: Find the rest of the icons
+        return {'Gender':'Gender','Company':'Company','Married':'Marriage',
+            'Faction':'Faction','Education':'Education','Item Market':'Item Market',
+            'Stock Market':'Stock Market','Drug Cooldown':'Drug Cooldown',
+            'Medical Cooldown':'Medical Cooldown','Booster Cooldown':'Booster Cooldown',
+            'Hospital':'Hospital','Low Life':'Low Life','Jail':'Jail',
+            'Bank Investment':'Bank','Donator':'Donator','Bazaar':'Bazaar',
+            'Racing':'Racing','Property Vault':'Property Vault','High Bidder':'Auction House'};
+    },
+    shortInfoText: function(key,text) {
+        /* TODO: More? */
+        switch(key) {
+            case 'Bank Investment':
+                text = this.shortTimeText(text).replace('Current bank investment worth','');
+            break;
+            case 'Education':
+                text = this.shortTimeText(text).replace('Currently completing the','');
+            break;
+        }
+        return text;
+    },
+    shortTimeText: function(str) {
+        str = str.replace(' days','d').replace(' hours, ',':').replace(' minutes and ',':').replace(' seconds','');
+        return str.replace(/(\d+):(\d+):(\d+)/,function($0,$1,$2,$3){
+            return ($1.length == 1 ? "0" + $1: $1) + ':' + ($2.length == 1 ? "0" + $2: $2) + ':' + ($3.length == 1 ? "0" + $3: $3);
+        });
+        
+    }
+
+
 
 })

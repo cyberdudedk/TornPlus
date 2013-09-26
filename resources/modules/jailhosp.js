@@ -1,5 +1,5 @@
 ({
-    jailquickbust: new Func("Jail Quick Bust", function(){
+    jailquickbust: new Func("Jail Quick Bust", function(){ /* TODO: Support Captcha */
         Torn.ui.pageContent.jail.getRows().find('td:eq(7) a').click(function(){
             var msg = getPageSync($(this).attr('href') + '1').ui.pageContent.jail.getBustMessage();
 
@@ -16,7 +16,7 @@
 
     ,
 
-    jailquickbail: new Func("Jail Quick Bail", function(){
+    jailquickbail: new Func("Jail Quick Bail", function(){ /* TODO: Support Captcha */
         Torn.ui.pageContent.jail.getRows().find('td:eq(6) a').click(function(){
             var msg = getPageSync(
                 getPageSync($(this).attr('href'))

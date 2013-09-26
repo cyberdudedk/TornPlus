@@ -45,3 +45,16 @@
 .noticemsg.info {
     background-color:lightSkyBlue;
 }
+
+#iconTraynew {
+    float:left;
+}
+
+#iconTraynew .iconShow {
+    float: left;
+}
+
+#iconTraynew .iconSpan {
+    float: none;
+    font-size:10px;
+}

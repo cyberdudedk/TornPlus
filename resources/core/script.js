@@ -161,7 +161,9 @@ Script = {
                         if(this.modulePages[pageId] == undefined) this.modulePages[pageId] = [];
                         this.modulePages[pageId].push({funcName:funcName,conditions:page});
                     }
-                    var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':func._options};
+                    var options = func._options;
+                    if(typeof(options) == 'function') options = options.call(mod);
+                    var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':options};
                     this.moduleInfos[funcName] = obj;
                 }
                 else {

@@ -4,6 +4,8 @@
 TornAPI = function(p) {
     var page = jQuery(p);
     var self = this;
+
+
     this.style = {
         isOld: function() {
             return $('#banner').size() == 0;
@@ -14,7 +16,8 @@ TornAPI = function(p) {
         isRespo: function() {
             return false; /* TODO: Detection needed when Respo is released */
         }
-    } 
+    }
+
 
     this.ui = {
         navigation: {
@@ -223,6 +226,11 @@ TornAPI = function(p) {
                     getMessage: function() {
                         return $('center',self.ui.content()).text();
                     }
+                }
+            },
+            iteminfo: {
+                getInfoTable: function() {
+                    return self.ui.content().filter('.data:first');
                 }
             }
             /* TODO: More */
