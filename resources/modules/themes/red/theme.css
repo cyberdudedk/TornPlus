@@ -1,0 +1,15 @@
+body,td {
+    color: #CF615A;
+}
+
+span, font, a:link, a {
+    color: #CF615A !important;
+}
+
+.bgDark {
+    background-color: #CF615A;
+}
+
+li.title {
+    background-position: 0 -122px;
+}

@@ -40,9 +40,9 @@ Func = function(title,f) {
         return this;
     }
     
-    this.option = function(name,type,value,min,max) {
+    this.option = function(name,type,value,additionalParams) {
         if(typeof(this._options) == 'undefined') this._options = [];
-        this._options.push(Option(name,type,value,min,max));
+        this._options.push(Option(name,type,value,additionalParams));
         return this;
     }
     
@@ -94,12 +94,11 @@ Func = function(title,f) {
 };
 
 /* Option Datastructure used in setting options for modules Func */
-Option = function(name,type,value,min,max) {
+Option = function(name,type,value,additionalParams) {
     var obj = {'name':name};
     obj['type'] = type;
     obj['value'] = value;
-    if(typeof(min) != 'undefined') obj['min'] = min;
-    if(typeof(max) != 'undefined') obj['max'] = max;
+    if(typeof(additionalParams) != 'undefined') obj['params'] = additionalParams;
     return obj;
 }
 

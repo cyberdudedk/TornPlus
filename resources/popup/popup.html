@@ -45,9 +45,10 @@
 
 #functions {
     float: left;
-    width: 520px;
+    width: 570px;
     height: 400px;
     border: 1px solid black;
+    overflow-y: scroll;
 }
 
 #buttons {
@@ -121,77 +122,81 @@ var log;
 var moduleInfos = {};
 var sortedInfos = {};
 var $;
-
-
+var loaded = false;
+var started = false;
 
 
 function crossriderMain(jq) {
     /* Message listener to communicate with extension scope */
-    $ = jq;
+    if(!started) {
+        started = true;
+        $ = jq;
 
-    appAPI.message.addListener(function(msg){
-        switch(msg.action) {
-            case 'giveUserId':
-                continueLoad(msg.id);
-            break;
-        }
-    });
-
-
-
-
-    /* Debugging to Debug select, since we can't debug to a firefox like window, in the popup
-        We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
-        So I temporarily added a visible debug "bar"
-         */
-    log = function(m) {
-        if(m == null) m = 'null';
-        if(typeof(m) == 'object') m = m.toSource();
-        $debug = $('#debug');
-        console.log(m);
-        var $opt = $('<option></option>').appendTo($debug);
-        $opt.text(m);
-        $debug.scrollTop($debug.scrollTop() + ($opt.offset().top - $debug.offset().top));
-    };
+        /* Debugging to Debug select, since we can't debug to a firefox like window, in the popup
+            We do have Firefox Error Console which the log is also send to, but I find the Error Console very poor.
+            So I temporarily added a visible debug "bar"
+             */
+        log = function(m) {
+            if(m == null) m = 'null';
+            if(typeof(m) == 'object') m = m.toSource();
+            $debug = $('#debug');
+            console.log(m);
+            var $opt = $('<option></option>').appendTo($debug);
+            $opt.text(m);
+            $debug.scrollTop($debug.scrollTop() + ($opt.offset().top - $debug.offset().top));
+        };
 
 
-    $('#debug').change(function(){
-        var str = '';
-        $("#debug option:selected").each(function () {
-            str += $(this).text() + " ";
+        $('#debug').change(function(){
+            var str = '';
+            $("#debug option:selected").each(function () {
+                str += $(this).text() + " ";
+            });
+            $("#debugtxt").text(str);
         });
-        $("#debugtxt").text(str);
-    });
 
-    var xOffset = 10;
-    var yOffset = 20;
-    $(document).on({
-        mouseenter: function () {
-            this.t = this.title;
-            this.title = "";
-            $("body").append("<p id='tooltip'>"+ this.t +"</p>");
-            $("#tooltip")
-                .css("top",(e.pageY - xOffset) + "px")
-                .css("left",(e.pageX + yOffset) + "px")
+        appAPI.message.addListener(function(msg){
+            switch(msg.action) {
+                case 'giveUserId':
+                        if(loaded == false) {
+                            continueLoad(msg.id);
+                        }
 
-        },
-        mouseleave: function () {
-            if (this.t)
-            this.title = this.t;
-            $("#tooltip").remove();
-        },
-        mousemove: function(e){
-            $("#tooltip")
-                .css("top",(e.pageY - xOffset) + "px")
-                .css("left",(e.pageX + yOffset) + "px");
-        }
-    }, ".tooltip");
+                break;
+            }
+        });
 
-    //this.onerror = function(e){alert(e);};
-    appAPI.message.toActiveTab({action:'getUserId',from:'popup'});
+        var xOffset = 10;
+        var yOffset = 20;
+        $(document).on({
+            mouseenter: function () {
+                this.t = this.title;
+                this.title = "";
+                $("body").append("<p id='tooltip'>"+ this.t +"</p>");
+                $("#tooltip")
+                    .css("top",(e.pageY - xOffset) + "px")
+                    .css("left",(e.pageX + yOffset) + "px")
+
+            },
+            mouseleave: function () {
+                if (this.t)
+                this.title = this.t;
+                $("#tooltip").remove();
+            },
+            mousemove: function(e){
+                $("#tooltip")
+                    .css("top",(e.pageY - xOffset) + "px")
+                    .css("left",(e.pageX + yOffset) + "px");
+            }
+        }, ".tooltip");
+
+        //this.onerror = function(e){alert(e);};
+        appAPI.message.toActiveTab({action:'getUserId',from:'popup'});
+    }
 }
 
 var continueLoad = function(id) {
+    loaded = true;
     if(id == null) {
         $('#status').text('Login to Torn and try again');
         return;
@@ -210,7 +215,6 @@ var continueLoad = function(id) {
     //moduleInfos = appAPI.db.get('moduleInfos');
     Script.getModuleInfos(function(moduleInfos) {
         var options = Script.getValue('moduleOptions') || {};
-
         var enabledFunc = options['enabled'] || {};
         var funcOptions = options['options'] || {};
 
@@ -239,7 +243,15 @@ var continueLoad = function(id) {
                         this.value = this.value.replace(/[^0-9]/gi, '');
                     });
                 break;
-
+                case 'color':
+                    obj = $('<input type="text">').attr('name',name).val(value);
+                break;
+                case 'dropdown':
+                    obj = $('<select></select>').attr('name',name);
+                    for(var key in opt.params) {
+                        $('<option></option>').attr('value',key).text(opt.params[key]).prop('selected',key==value).appendTo(obj);
+                    }
+                break;
                 default:
                     log(name + ' : ' + opt.type + ' = ' + value);
                 break;

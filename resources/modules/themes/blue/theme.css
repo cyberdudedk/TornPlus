@@ -1,0 +1,15 @@
+body,td {
+    color: #5E94CD;
+}
+
+span, font, a:link, a {
+    color: #5E94CD !important;
+}
+
+.bgDark {
+    background-color: #5E94CD;
+}
+
+li.title {
+    background-position: 0 -44px;
+}

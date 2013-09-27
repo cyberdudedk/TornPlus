@@ -206,6 +206,31 @@
         
     }
 
+    ,
+
+    backgroundcolor: new Func('Change background color',function() { /* TODO: Fix better, when Crossrider allows me to better fix */
+        var inHospital = Torn.user.status.isInHospital();
+        var inJail = Torn.user.status.isInJail();
+        if(this.Normal != '#CCCCCC') {
+            if(!inHospital && !inJail)
+                $('body').attr('bgcolor',this.Normal);
+        }
+        if(this.InJail != '#BBA47E') {
+            if(inJail)
+                $('body').attr('bgcolor',this.InJail);
+        }
+        if(this.InHospital != '#FFFFFF') {
+            if(inHospital)
+                $('body').attr('bgcolor',this.InHospital);
+        }
+    })
+    .on('load')
+    .pages('allpages')
+    .category('UI')
+    .desc('Choose a custom background color')
+    .option('Normal','color','#CCCCCC')
+    .option('InJail','color','#BBA47E')
+    .option('InHospital','color','#FFFFFF')
 
 
 })
