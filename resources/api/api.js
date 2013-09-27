@@ -232,6 +232,26 @@ TornAPI = function(p) {
                 getInfoTable: function() {
                     return self.ui.content().filter('.data:first');
                 }
+            },
+            museum: {
+                step: {
+                    getList: function() {
+                        var list = self.ui.content().filter('table:first').find('td').html().split('<br>');
+                        return list;
+                    },
+                    getNavigationTable: function() {
+                        return self.ui.content().filter('table:last');
+                    },
+                    getExchangeLink: function() {
+                        return self.ui.content().find('a[href^="museum.php?rfc="]');
+                    },
+                    getMessage: function() {
+                        var b = self.ui.content().filter('b:first');
+                        if(b.size() > 0) return b.text();
+                        return self.ui.content().filter(function () { return this.nodeType === 3; }).text().replace('>','');
+                    }
+
+                }
             }
             /* TODO: More */
         },

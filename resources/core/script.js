@@ -104,7 +104,15 @@ Script = {
                                     }
                                     var conditionsMet = true;
                                     for(var conKey in conditions) {
-                                        conditionsMet = ((qs[conKey] == conditions[conKey]) && conditionsMet);
+                                        var result = false;
+                                        if(conditions[conKey] == undefined){
+                                            if(qs[conKey] != undefined)
+                                                result = true;
+                                        }
+                                        else
+                                            result = (qs[conKey] == conditions[conKey]);
+                                        
+                                        conditionsMet = (result && conditionsMet);
                                     }
                                     return conditionsMet;
                                 }
