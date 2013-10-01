@@ -435,10 +435,14 @@ TornAPI = function(p) {
             },
             /* Is either isFlying or isLanded (Not in Torn) */
             isTraveling: function() {
-                /* TODO: Implement */
+                return self.user.status.isFlying();
+                /* TODO: Further implement so it also accounts for isLanded when not in Torn  */
             },
             isFlying: function() {
-                /* TODO: Implement */
+                   /* TODO: Fix, is currently returning false when using Laptop or "Recruit a friend
+                   See if we can distinguish Flying from normal by the header/top that is different from normal.
+                   */
+                return $('div center font',page).text() == 'Travelling';
             },
             isLanded: function() {
                 /* TODO: Implement */

@@ -19,6 +19,7 @@
 Func = function(title,f) {
     this.module = {};
     this._onLoad = false;
+    this._customcontent = null;
     
     this._setModule = function(mod) {
         this.module = mod;
@@ -74,6 +75,11 @@ Func = function(title,f) {
             }
         }
 
+        return this;
+    }
+
+    this.customcontent = function(func) {
+        this._customcontent = func;
         return this;
     }
 

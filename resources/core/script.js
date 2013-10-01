@@ -156,22 +156,23 @@ Script = {
                 if(mod[modFunc] instanceof Func) {
                     tempPages = func._pages || [];
                     var pages = {};
-                    if(typeof(tempPages) == 'string') pages[tempPages] = {};
+                    if(typeof(tempPages) == 'string') {
+                        pages[tempPages] = {};
+                    }
                     else if(Array.isArray(tempPages)) {
                         for(var i in tempPages) pages[tempPages[i]] = {};
                     }
                     else pages = tempPages;
-                    
                     for(pageId in pages) {
-
                         page = pages[pageId];
-
                         if(this.modulePages[pageId] == undefined) this.modulePages[pageId] = [];
                         this.modulePages[pageId].push({funcName:funcName,conditions:page});
                     }
                     var options = func._options;
                     if(typeof(options) == 'function') options = options.call(mod);
-                    var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':options};
+                    var customcontent = null;
+                    if(func._customcontent != null) customcontent = func._customcontent.call(mod);
+                    var obj = {'title':func._title,'category':func._category,'desc':func._description,'pages':func._pages,'options':options,'customcontent':customcontent};
                     this.moduleInfos[funcName] = obj;
                 }
                 else {

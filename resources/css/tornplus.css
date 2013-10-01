@@ -69,3 +69,7 @@
     margin:0px;
     border:0px;
 }
+
+.data.subdata tr.bgDark {
+    background-color: #545454;
+}

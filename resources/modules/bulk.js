@@ -14,44 +14,44 @@
         var bulkdiv = $('<div id="meseumbulk"></div>').append(
             $('<table></table>').attr({class:'data', border:"0", cellpadding:"0", cellspacing:"1"})
                 .append($('<thead></thead>')
-					.append($('<tr></tr>').attr({class:'bgDark ftWhite'})
-						.append($('<th></th>').css({width:'75px'}).append('No. Sets'))
+                    .append($('<tr></tr>').attr({class:'bgDark ftWhite'})
+                        .append($('<th></th>').css({width:'75px'}).append('No. Sets'))
                         .append($('<th></th>').append('Quick Slider'))
-						.append($('<th></th>').css({width:'100px'}).append('Total Points'))
-						.append($('<th></th>').css({width:'120px'}).append('Bulk Exchange'))
-					)
+                        .append($('<th></th>').css({width:'100px'}).append('Total Points'))
+                        .append($('<th></th>').css({width:'120px'}).append('Bulk Exchange'))
+                    )
                 )
                 .append($('<tbody></tbody>')
                     .append($('<tr></tr>').attr({class:'bgAlt3'})
-						.append($('<td></td>')
-							.append($('<div></div>').attr({id:'museum_no'}).append(sets))
-						)
-                        .append($('<td></td>')
-                            .append(slider)
-						)
-                        .append($('<td></td>')
-							.append($('<div></div>').attr({id:'museum_points'}))
-						)
-                        .append($('<td></td>')
-                            .append('[')
-							.append($('<a></a>').attr('href','#').append('Exchange').click(function(){
-                                var val = Utils.number($('#museum_no').text());
-                                var href = Torn.ui.pageContent.museum.step.getExchangeLink().attr('href');
-                                for(var i = 0; i<val;i++) {
-                                    var page = getPageSync(href);
-                                    var href = page.ui.pageContent.museum.step.getExchangeLink().attr('href');
-                                    var msg = page.ui.pageContent.museum.step.getMessage();
-                                    var msgType = 'info';
-                                    if(msg.indexOf('You do not have the') > -1) msgType = 'bad';
-                                    else if(msg.indexOf('You have exchanged') > -1) msgType = 'Good';
-                                    notice(msg,msgType);
-                                }
-                                return false;
-                            }))
-                            .append(']')
-						)
+                    .append($('<td></td>')
+                        .append($('<div></div>').attr({id:'museum_no'}).append(sets))
+                    )
+                    .append($('<td></td>')
+                        .append(slider)
+                    )
+                    .append($('<td></td>')
+                        .append($('<div></div>').attr({id:'museum_points'}))
+                    )
+                    .append($('<td></td>')
+                    .append('[')
+                        .append($('<a></a>').attr('href','#').append('Exchange').click(function(){
+                            var val = Utils.number($('#museum_no').text());
+                            var href = Torn.ui.pageContent.museum.step.getExchangeLink().attr('href');
+                            for(var i = 0; i<val;i++) {
+                                var page = getPageSync(href);
+                                var href = page.ui.pageContent.museum.step.getExchangeLink().attr('href');
+                                var msg = page.ui.pageContent.museum.step.getMessage();
+                                var msgType = 'info';
+                                if(msg.indexOf('You do not have the') > -1) msgType = 'bad';
+                                else if(msg.indexOf('You have exchanged') > -1) msgType = 'Good';
+                                notice(msg,msgType);
+                            }
+                            return false;
+                        }))
+                        .append(']')
                     )
                 )
+            )
         );
 
         Torn.ui.pageContent.museum.step.getNavigationTable().next().after(bulkdiv);
