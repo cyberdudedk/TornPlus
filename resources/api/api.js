@@ -251,7 +251,19 @@ TornAPI = function(p) {
                     }
 
                 }
+            },
+            userimages: {
+                viewimage: {
+                    getImage: function() {
+                        return self.ui.content().find('img');
+                    }
+                },
+                getImages: function() {
+                    return self.ui.content().find('a[href^="userimages.php?step=viewimage&ID="]:odd');
+                }
+
             }
+
             /* TODO: More */
         },
 

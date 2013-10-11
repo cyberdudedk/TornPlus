@@ -73,3 +73,83 @@
 .data.subdata tr.bgDark {
     background-color: #545454;
 }
+
+
+.plus_profile_image_overlay:hover .image_controls
+{
+    display: block;
+}
+
+.plus_profile_image_overlay
+{
+    display:block;
+    position: relative;
+    height: 100%;
+    width: 0px;
+}
+
+.control_sides
+{
+    width: 50px;
+    height: 100%;
+}
+
+.image_controls
+{
+    width: 100%;
+    display: none;
+    float: left;
+    position: absolute;
+    height:100%;
+}
+
+.image_control
+{
+    display: table-cell;
+    position: absolute;
+    top: 0px;
+    background-color:black;
+    color:white;
+    opacity:0.4;
+}
+
+.image_control:hover
+{
+    opacity:0.7;
+}
+
+.control_top
+{
+    width: 100%;
+}
+
+.control_left
+{
+    text-align: left;
+    left: 0px;
+}
+
+.control_right
+{
+    right: 0px;
+    text-align: right;
+}
+
+.control_inner
+{
+    display: block;
+    position: relative;
+    top: 50%;
+}
+
+.control_left .control_inner
+{
+    text-align: left;
+    float: left;
+}
+ 
+.control_right .control_inner
+{
+    text-align: right;
+    float: right;
+}

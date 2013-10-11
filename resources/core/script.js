@@ -8,6 +8,8 @@ Script = {
     moduleInfos: {},
     tempValues: {},
     pageCallbacks: {},
+    keyboardCallbacks: {},
+    keyboadHooked: false,
     init: function() {
         $("#announce").parent().after('<div id="noticebarwrapper"><div id="noticebarouter"><div id="noticebar"></div></div></div>');
         $(document).on('scroll',function(e) {
@@ -279,6 +281,26 @@ Script = {
         if(typeof(this.loadedCSS[name]) == 'undefined') {
             appAPI.resources.includeCSS('css/'+name+'.css');
             this.loadedCSS[name] = true;
+        }
+    },
+    keyboard: function(keycode, callback) {
+
+        if(typeof(this.keyboardCallbacks[keycode]) == 'undefined') {
+            this.keyboardCallbacks[keycode] = [];
+        }
+        this.keyboardCallbacks[keycode].push(callback);
+        this._hookkeyboard();
+    },
+    _hookkeyboard: function() {
+        if(this.keyboadHooked == false) {
+            $(document).keydown(function(e) {
+                if(typeof(Script.keyboardCallbacks[e.keyCode]) != 'undefined') {
+                    Script.keyboardCallbacks[e.keyCode].forEach(function(v){
+                        v.call();
+                    });
+                }
+            });
+            this.keyboadHooked = true;
         }
     },
 
