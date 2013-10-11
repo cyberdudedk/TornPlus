@@ -42,7 +42,13 @@
             var tds = $(this).find('td');
             var level = Utils.number(tds.eq(4).text());
             var timespl = tds.eq(3).text().split(' ');
-            var mins = (parseInt(timespl[0]) * 60) + (timespl.length == 5 ? parseInt(timespl[2]) : 0);
+            var mins;
+            if(timespl.length == 5) {
+                mins = (parseInt(timespl[0]) * 60) + (timespl.length == 5 ? parseInt(timespl[2]) : 0);
+            } else {
+                mins = (parseInt(timespl[0]));
+            }
+
             var price = (mins+1)*level*multiplier;
             tds.eq(6).find('a').append(' For $' + Utils.tornNumber(price));
         });
@@ -62,7 +68,9 @@
 
                 var msgType = 'good';
                 if(msg.indexOf('You do not have') > -1) msgType = 'info';
+                else if(msg.indexOf('This user is not') > -1) msgType = 'info';
                 else if(msg.indexOf('This person does not') > -1) msgType = 'bad';
+
                 notice(msg,msgType);
                 return false;
             });

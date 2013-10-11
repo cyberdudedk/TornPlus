@@ -236,8 +236,7 @@ TornAPI = function(p) {
             museum: {
                 step: {
                     getList: function() {
-                        var list = self.ui.content().filter('table:first').find('td').html().split('<br>');
-                        return list;
+                        return self.ui.content().filter('table:first');
                     },
                     getNavigationTable: function() {
                         return self.ui.content().filter('table:last');

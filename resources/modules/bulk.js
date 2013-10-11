@@ -1,10 +1,28 @@
 ({
     bulkmuseum: new Func('Bulk exchange sets in Museum',function(page,qs){
         var items = this.module.stepItems()[qs.step];
+        var datalist = Script.getDataList('items');
         var userItems = Torn.user.items.list();
         var sets = Number.MAX_VALUE;
+
+        var itemTbl = $('<table></table>').addClass('data').attr({width:"50%", border:"0", cellpadding:"0", cellspacing:"1"}).append(
+            $('<thead></thead>').append($('<tr></tr>').attr({class:'bgDark ftWhite'})
+                .append('<th>Item</th>')
+                .append('<th>Available</th>')
+                .append('<th>Required</th>')
+            )
+
+        )
+
         for(var i in items) {
-            var quan = ((userItems[items[i]] || {quantity:0}).quantity) / this.module.itemQuantity(items[i]);
+            var id = items[i];
+            var quanReq = this.module.itemQuantity(id);
+            var quan = ((userItems[id] || {quantity:0}).quantity) / quanReq;
+            $('<tr></tr>')
+                .append($('<td></td>').append('<a href="/iteminfo.php?XID='+id+'">'+datalist[id]+'</a>'))
+                .append('<td>'+quan+'</td>')
+                .append('<td>'+quanReq+'</td>')
+            .appendTo(itemTbl);
             sets = Math.min(sets,quan);
         }
         var pointsPerSet = Utils.number(Torn.ui.content().filter('b:eq(1)').text());
@@ -54,7 +72,11 @@
             )
         );
 
+        itemTbl.find('tbody tr:odd').addClass('bgAlt1');
+        itemTbl.find('tbody tr:even').addClass('bgAlt2');
+
         Torn.ui.pageContent.museum.step.getNavigationTable().next().after(bulkdiv);
+        Torn.ui.pageContent.museum.step.getList().after(itemTbl).remove();
 
         sliderInPage = function(channel) {
             var slider = $('#museum_slider');
@@ -86,7 +108,7 @@
     stepItems: function() {
         return {
             1:[186, 187, 215, 258, 261, 266, 268, 269, 273, 274, 281, 384, 618],
-            2:[260, 263, 264, 267, 271, 272, 276, 277, 282, 385, 617],
+            2:[260, 264, 282, 277, 276, 271, 272, 263, 267, 385, 617],
             3:[450, 451, 452],
             4:[454],
             5:[453],
