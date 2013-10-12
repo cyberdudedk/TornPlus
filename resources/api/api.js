@@ -262,6 +262,13 @@ TornAPI = function(p) {
                     return self.ui.content().find('a[href^="userimages.php?step=viewimage&ID="]:odd');
                 }
 
+            },
+            newspaper: {
+                hof: {
+                    getNavigationTable: function() {
+                        return self.ui.content().find('table:first');
+                    }
+                }
             }
 
             /* TODO: More */
