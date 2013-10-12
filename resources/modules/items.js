@@ -35,6 +35,29 @@
 
     ,
 
+    searchitems: new Func('Search for items', function(){
+        var searchForm = Torn.ui.searchForm();
+        var searchSelector = searchForm.find('#mode');
+        searchSelector.append('<option value="itemmarket">Item Market</option>');
+
+        searchSelector.change(function(){
+            var searchType = $(this).val();
+            if(searchType == 'itemmarket') {
+                searchForm.get(0).setAttribute('action','/imarket.php?step=shop&submit=Search');
+                searchForm.find('#userword').attr('name', 'searchname');
+                searchForm.append('<input type="hidden" name="step" value="shop" />');
+            } else {
+                searchForm.find('input[type="hidden"]').remove();
+            }
+        })
+    })
+    .category('items')
+    .desc('Add an option to search for an item name in the search box in the top bar')
+    .pages('allpages')
+
+
+    ,
+
     helpers: {
         generateMarket: function(id) {
             var market = $("<div id=\"market_item\"></div>");

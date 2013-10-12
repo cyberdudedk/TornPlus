@@ -43,6 +43,9 @@ TornAPI = function(p) {
         banner: function() {
             return $('#banner');
         },
+        searchForm: function() {
+            return $('#searchForm');
+        },
         content: function(){
             var obj = page.find('.tornpluscontent');
             if(obj.size() > 0) page = obj;
