@@ -592,7 +592,6 @@ TornAPI = function(p) {
                 bail: function() {
                     var totalPercent = 1;
                     var bails = self.user.perks.byEffect.bail();
-
                     bails.forEach(function(v){
                         totalPercent = totalPercent * ((100 - Utils.number(v))/100.0);
                     });
@@ -602,7 +601,7 @@ TornAPI = function(p) {
                     Bug reported here: http://www.torn.com/forums.php?forumID=19&ID=15718385
                     */
                     if(totalPercent == 0.85) totalPercent = 0.855 /* TODO: Temp fix */
-                    if(totalPercent == 0.65) totalPercent = 0.78625 /* TODO: Temp fix */
+                    if(totalPercent == 0.35) totalPercent = 0.4275 /* TODO: Temp fix */
                     return totalPercent;
                 }
             }

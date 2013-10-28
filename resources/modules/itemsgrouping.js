@@ -10,17 +10,28 @@
                 }
             }
         }
-
         var itemTbls = Torn.ui.content().find('.data');
         var itemRows = itemTbls.find('tbody tr');
-
         itemRows.each(function(){
             var id = Utils.number($(this).find('td:first a:first').attr('href'));
+
             var reverse = reverseLookup[id];
-            if(typeof(groups[reverse.outer][reverse.inner]) != 'object') {
-                groups[reverse.outer][reverse.inner] = [];
+            if(typeof(reverse) != 'undefined') {
+                if(typeof(groups[reverse.outer][reverse.inner]) != 'object') {
+                    groups[reverse.outer][reverse.inner] = [];
+                }
+                groups[reverse.outer][reverse.inner].push($(this));
+            } else {
+                var outer = 'Misc'; inner = 'Undefined';
+                if(typeof(groups[outer]) != 'object') {
+                    groups[outer] = {};
+                }
+                if(typeof(groups[outer][inner]) != 'object') {
+                    groups[outer][inner] = [];
+                }
+                groups[outer][inner].push($(this));
             }
-            groups[reverse.outer][reverse.inner].push($(this));
+
         });
 
         /* TODO: Clean up if possible */
