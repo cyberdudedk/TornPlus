@@ -11,7 +11,6 @@
                 .append('<th>Available</th>')
                 .append('<th>Required</th>')
             )
-
         )
 
         for(var i in items) {
@@ -64,6 +63,7 @@
                                 else if(msg.indexOf('You have exchanged') > -1) msgType = 'Good';
                                 notice(msg,msgType);
                             }
+                            reload();
                             return false;
                         }))
                         .append(']')

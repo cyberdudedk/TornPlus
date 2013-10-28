@@ -7,6 +7,7 @@
             if(msg.indexOf('You busted') > -1) msgType = 'good';
             else if(msg.indexOf('While trying') > -1) msgType = 'bad';
             notice(msg,msgType);
+            reload();
             return false;
         });
     })
@@ -26,6 +27,7 @@
             var msgType = 'info';
             if(msg.indexOf('You bought') > -1) msgType = 'good';
             notice(msg,msgType);
+            reload();
             return false;
         });
     })
@@ -38,6 +40,7 @@
     jailbailhelper: new Func("Jail Bail Helper", function(){
         var inLawFirm = (Torn.user.job.company() == 'Law Firm');
         var multiplier = 25 * (Torn.user.perks.byResult.bail() * (inLawFirm == true ? 0.5 : 1));
+
         Torn.ui.pageContent.jail.getRows().each(function(){
             var tds = $(this).find('td');
             var level = Utils.number(tds.eq(4).text());
@@ -48,7 +51,6 @@
             } else {
                 mins = (parseInt(timespl[0]));
             }
-
             var price = (mins+1)*level*multiplier;
             tds.eq(6).find('a').append(' For $' + Utils.tornNumber(price));
         });
@@ -72,6 +74,7 @@
                 else if(msg.indexOf('This person does not') > -1) msgType = 'bad';
 
                 notice(msg,msgType);
+                reload();
                 return false;
             });
         });
