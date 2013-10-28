@@ -1,14 +1,19 @@
 ({
     hideupgradelink: new Func("Hide upgrade link", function(){
-        $('a[href*="level2.php"]').each(function(){
-            var par = $(this).parent();
-            $(this).remove();
-            if(par.attr('id') == 'noteBox') {
-                var spl = par.html().split('!');
-                spl.splice(2,1);
-                par.html(spl.join('!'));
-            }
-        });
+        var hideLinks = function() {
+            $('a[href*="level2.php"]').each(function(){
+                var par = $(this).parent();
+                $(this).remove();
+                if(par.attr('id') == 'noteBox') {
+                    var spl = par.html().split('!');
+                    spl.splice(2,1);
+                    par.html(spl.join('!'));
+                }
+            });
+        }
+        hideLinks();
+        Script.hookAjax('refreshenergy',hideLinks);
+        Script.hookAjax('gym',hideLinks);
     })
     .category('UI')
     .desc("Hide Level upgrade link, so you can't accidentally click it.<br>Good for level holding")
@@ -232,5 +237,93 @@
     .option('InJail','color','#BBA47E')
     .option('InHospital','color','#FFFFFF')
 
+    ,
+
+    tinymceeditor: new Func('Enable TinyMCE Editor', function(page,qs){
+        /* TODO:
+            - Fix hiding smileys(url/img) buttons in message (currently hides subject) and forum edit/quote
+            - Torn smileys dropdown
+            - Torn smileys (BBCode converter?)
+            - Fix toggle button position in forum edit/quote
+         */
+
+        var tinyLoaded = false;
+        var enablePageLoad = this.EnableDefault;
+        var textarea = $('textarea[name]');
+        var originalNav = textarea.parents('tr:first').prev();
+        var div = $('<div></div>').css({'width':'90%','text-align':'left','position':'left'})
+            .append($('<div></div>').css({'position':'absolute'})
+                .append(
+                    $('<input />').attr('type','checkbox').prop('checked',enablePageLoad).change(function(){
+                        var val = $(this).prop('checked');
+                        toogleTiny(val);
+                    })
+                )
+                .append('Toggle TinyMCE Editor')
+            )
+
+        textarea.after(div);
+
+        var toogleFunc = function() {
+            tinymce.execCommand('mceToggleEditor', true, tinymce.activeEditor.id);
+        }
+        var toogleTiny = function(value) {
+
+            if(value && !tinyLoaded) {
+                loadTiny();
+            } else {
+                Script.fromPage('tinymce',toogleFunc,function(){
+                    originalNav.toggle(!value);
+                });
+            }
+        }
+        var loadTiny = function() {
+            tinyMCE = function(channel) {
+                window.tinymce.dom.Event.domLoaded = true;
+                tinymce.init({
+                    selector: 'textarea[name]',
+                    statusbar: false,
+                    forced_root_block: false,
+                    plugins: [
+                        "advlist lists link autolink image charmap print preview hr anchor",
+                        "searchreplace wordcount visualblocks code fullscreen",
+                        "insertdatetime media nonbreaking table ",
+                        "emoticons paste textcolor code tornbbcode"
+                    ],
+                    toolbar1: "undo redo | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+                    toolbar2: "print preview media | forecolor backcolor emoticons",
+                    setup: function(ed) {
+                        ed.settings.width = $(ed.getElement()).outerWidth()-1;
+                        ed.settings.height = $(ed.getElement()).outerHeight()-48;
+                    }
+                });
+
+                
+            }
+
+            appAPI.dom.addRemoteJS('//tinymce.cachefly.net/4/tinymce.min.js',function() {
+                appAPI.resources.addInlineJS('lib/tinymce/plugins/tornbbcode/plugin.js');
+                Script.fromPage('tinymce',tinyMCE,function(){
+                    originalNav.toggle(false);
+                });
+                tinyLoaded = true;
+            });
+        }
+
+        if(enablePageLoad) {
+            toogleTiny(true);
+        }
+
+    })
+    .pages({
+            'messages':[{'action':'send'},{'action':'read'}],
+            'savedmessages':{'action':'read'},
+            'forums':{'ID':null},
+            'edit2':{'ID':null},
+            'quote':{'ID':null},
+            'preferences':{'action':'psig'}
+        })
+    .category('UI')
+    .option('EnableDefault','boolean',false)
 
 })
