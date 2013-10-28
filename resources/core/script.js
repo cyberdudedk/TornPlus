@@ -10,6 +10,12 @@ Script = {
     pageCallbacks: {},
     keyboardCallbacks: {},
     keyboadHooked: false,
+    ajaxCallbacks: {},
+    ajaxPages: {
+        '/includes/chainbar.php':'chainbar',
+        '/refreshenergy.php':'refreshenergy',
+        '/includes/embeddedgym1.php':'gym'
+    },
     init: function() {
         $("#announce").parent().after('<div id="noticebarwrapper"><div id="noticebarouter"><div id="noticebar"></div></div></div>');
         $(document).on('scroll',function(e) {
@@ -26,7 +32,38 @@ Script = {
                 Script.pageCallbacks[data.channel].call(null,data.value);
             }
         });
-        
+
+
+        Script.hookAjaxCalls();
+    },
+    hookAjax: function(type, callback) {
+        if(typeof(Script.ajaxCallbacks[type]) == 'undefined')
+            Script.ajaxCallbacks[type] = [];
+        Script.ajaxCallbacks[type].push(callback);
+    },
+    runAjaxHook: function(type) {
+        if(typeof(Script.ajaxCallbacks[type]) != 'undefined') {
+            Script.ajaxCallbacks[type].forEach(function(v){
+                v.call();
+            });
+        }
+    },
+    hookAjaxCalls: function() {
+        Script.fromPage('ajaxCalls',
+            function(channel){
+                $('body').ajaxComplete(function(e, xhr, settings) {
+                    retrieve(channel,settings);
+                });
+            },
+            function(data) {
+                if(typeof(data) != 'undefined') {
+                    var url = data.url;
+                    var page = url.split('?')[0];
+                    if(typeof(Script.ajaxPages[page]) != 'undefined') {
+                        Script.runAjaxHook(Script.ajaxPages[page]);
+                    }
+                }
+            })
     },
     fromPage: function(channel,func,callback) {
         Script.pageCallbacks[channel] = callback;
@@ -149,6 +186,15 @@ Script = {
                 }
             }
         });
+
+        Script.postRun();
+    },
+    postRun: function() {
+        var storedMessages = Script.getValueRefresh('noticemessages');
+        if(storedMessages != null)
+            Helpers.rebuildNotices(storedMessages);
+
+        Script.clearRefreshValues();
     },
     recursiveLoadModule: function(modname, mod){
         if(typeof(mod) != 'undefined') {
@@ -226,8 +272,23 @@ Script = {
         } else {
             return appAPI.db.get(Script.userId()+'/'+key);
         }
-
     },
+    setValueRefresh: function(key,value) {
+        appAPI.db.set('pagerefresh/'+key,value)
+    },
+    getValueRefresh: function(key) {
+        return appAPI.db.get('pagerefresh/'+key);
+    },
+    clearRefreshValues: function() {
+        var keys = appAPI.db.getKeys();
+        for(var kId in keys) {
+            var k = keys[kId];
+            if(k.indexOf('pagerefresh') == 0) {
+                appAPI.db.remove(k);
+            }
+        }
+    },
+
     _userid: null,
     _username: null,
     getUser: function() {

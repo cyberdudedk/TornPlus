@@ -13,7 +13,8 @@ TODO List
 * */
 var devFiles = ['chat','ajaxify','ui','stocks','gym','jailhosp','items','theming','bulk','itemsgrouping','userimages','hof'];
 
-var $, Torn, cachedValue, getPage, getPageSync, postPageSync, notice, noticeTimer, noticeIds = {}, noticeCounts = {};
+var $, Torn, cachedValue, getPage, getPageSync, postPageSync, notice, reload,
+    noticeTimer, noticeIds = {}, noticeCounts = {};
 
 appAPI.ready(function(jq) {
     //return; /* Disable */
@@ -32,6 +33,7 @@ appAPI.ready(function(jq) {
     appAPI.resources.includeJS('core/helpers.js');
     appAPI.resources.includeJS('core/classes.js');
     appAPI.resources.includeJS('api/api.js');
+
     appAPI.dom.addInlineJS(appAPI.resources.get('crossrider/CrossriderAPI.js'));
     appAPI.dom.addInlineCSS(appAPI.resources.get('css/tornplus.css'));
     Script.init();
@@ -54,6 +56,7 @@ appAPI.ready(function(jq) {
     getPageSync = Helpers.getPageSync;
     postPageSync = Helpers.postPageSync;
     notice = Helpers.notice;
+    reload = Helpers.reload;
 
     //Script.Dev.loadBackground();
     /* Use this to test collecting all cache from scratch */

@@ -198,7 +198,7 @@ Helpers = {
         }
         var ts;
         if(!noticeIds[type][msg]) {
-            ts = Utils.getFullTimestamp()
+            ts = Utils.getFullTimestamp();
             noticeIds[type][msg] = ts;
             noticeCounts[ts] = 1;
             var msgObj = $('<div id="noticemsg_'+ts+'" class="noticemsg '+type+'"><span class="noticecount"></span>'+msg+'</div>');
@@ -209,6 +209,9 @@ Helpers = {
             $('#noticemsg_' + ts + ' .noticecount').text(noticeCounts[ts] + 'x ');
         }
 
+        Helpers.runNoticeTimer();
+    },
+    runNoticeTimer: function() {
         clearTimeout(noticeTimer);
         noticeTimer = setTimeout(function(){
             noticeIds = {};
@@ -216,8 +219,43 @@ Helpers = {
             $('#noticebar').html('');
             $('#noticebar').removeClass('show');
         },5000);
+    },
+    rebuildNotices: function(storedMessages) {
 
+        var noticeIds = storedMessages['noticeIds'];
+        var noticeCounts = storedMessages['noticeCounts'];
+        var show = false;
+        for(var noticeCat in noticeIds) {
+            for(var noticeMsg in noticeIds[noticeCat]) {
+                var id = noticeIds[noticeCat][noticeMsg];
+                var num = noticeCounts[id];
+                var msgObj = $('<div id="noticemsg_'+id+'" class="noticemsg '+noticeCat+'"><span class="noticecount"></span>'+noticeMsg+'</div>');
+                if(num > 1) {
+                    msgObj.find('.noticecount').text(num + 'x ');
+                }
+                $('#noticebar').append(msgObj);
+                show = true;
+            }
+        }
+        if(show) {
+            $('#noticebar').addClass('show');
+            Helpers.runNoticeTimer();
+        }
+        
+    },
+
+    reload: function() {
+        var obj = {noticeIds:noticeIds, noticeCounts: noticeCounts};
+        Script.setValueRefresh('noticemessages',obj);
+
+        Helpers.reloadPage();
+    },
+
+    reloadPage: function() {
+        location.reload();
     }
+
+
 };
 
 
