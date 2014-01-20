@@ -28,8 +28,8 @@
     .category('Misc'),
 
     //TODO: Clean up
-    //TODO: "Loading" text, that explains that it can take up to 2 minutes.
     hofbytype: function() {
+        var me = this;
         var limits = [10,20,50,100,200];
         var keyvalues = Script.getDataList('hofkeys');
         var defaultLimit = 20;
@@ -57,6 +57,7 @@
             if(val != "") {
                 var userid = Torn.user.id();
                 var url = 'http://pb-software.net/tornplus/api.php?function=hof&id=' + userid + '&type=' + val + '&limit=' + limit;
+                tablediv.html('Loading... Please Wait');
                 appAPI.request.get({url:url, onSuccess: function(response){
                     tablediv.html('');
                     var json = appAPI.JSON.parse(response);
@@ -67,15 +68,22 @@
                     $('<td><b>Player</b></td>').attr('align','center').appendTo(rowheader);
                     $('<td><b>'+val+'</b></td>').attr('align','center').appendTo(rowheader);
                     var count = 0;
-                    $.each(json, function(i, item) {
+                    var converttype = json["converter"];
+                    var data = json["hof"];
+                    $.each(data, function(i, item) {
                         var bgcol = (count % 2 == 0 ? '#DFDFDF' : '#CCCCCC');
                         if(item.self) {
                             bgcol = (count % 2 == 0 ? '#DFF0DF' : '#CCDCCC');
                         }
                         var row = $('<tr></tr>').attr('bgcolor',bgcol).appendTo(tblList);
-                        $('<td><b># '+item.position+'</b></td>').appendTo(row);
-                        $('<td><b><a href="profiles.php?XID='+item.id+'">'+item.name+'</a></b></td>').attr('align','center').appendTo(row);
-                        $('<td>'+item.value+'</td>').attr('align','center').appendTo(row);
+                        $('<td><b>#'+item.position+ (item.minposition != item.position ? ' ( - '+item.minposition+')' : '') + '</b></td>').appendTo(row);
+                        if(item.id == 0) {
+                            $('<td>('+(item.minposition - item.position + 1)+' Players)</td>').attr('align','center').appendTo(row);
+                        } else {
+                            $('<td><b><a href="profiles.php?XID='+item.id+'">'+item.name+'</a></b></td>').attr('align','center').appendTo(row);
+                        }
+
+                        $('<td>'+me.converter(item.value,converttype)+'</td>').attr('align','center').appendTo(row);
                         count++;
                     });
 
@@ -100,14 +108,16 @@
     },
 
     personalhof: function() {
+        var me = this;
         var hr = Torn.ui.content().find('hr:last');
         var div = $('<div class="tornplus_hof"></div>').insertAfter(hr);
         var tablediv = $('<div class="tornplus_hof_tablediv"></div>').appendTo(div);
-        tablediv.html('Loading... Please wait while server is generating data, this can take up to 2 minutes.<br>You are welcome to navigate to another page and come back later, the data should then be ready for you.');
+        tablediv.html('Loading...');
         var userid = Torn.user.id();
-        var url = 'http://pb-software.net/tornplus/api.php?debug=true&function=myhof&id=' + userid;
+        var url = 'http://pb-software.net/tornplus/api.php?function=myhof&id=' + userid;
         appAPI.request.get({url:url, onSuccess: function(response){
             var json = appAPI.JSON.parse(response);
+
             tablediv.html('');
             var tblList = $('<table></table>').attr({width:"90%", cellspacing:"1", cellpadding:"2", border:"0"}).appendTo(tablediv);
             var rowheader = $('<tr></tr>').attr('bgcolor','#999999').appendTo(tblList);
@@ -119,8 +129,8 @@
                 var bgcol = (count % 2 == 0 ? '#DFDFDF' : '#CCCCCC');
                 var row = $('<tr></tr>').attr('bgcolor',bgcol).appendTo(tblList);
                 $('<td><b>'+item.keyname+'</b></td>').appendTo(row);
-                $('<td><b>'+item.position+'</b></td>').attr('align','center').appendTo(row);
-                $('<td>'+item.value+'</td>').attr('align','center').appendTo(row);
+                $('<td><b>'+item.position+ (item.minposition != item.position ? ' ( - '+item.minposition+')' : '') + '</b></td>').attr('align','center').appendTo(row);
+                $('<td>'+me.converter(item.value,item.type)+'</td>').attr('align','center').appendTo(row);
                 count++;
             });
 
@@ -128,6 +138,26 @@
             $('<td></td>').attr({align:"center",height:"10", colspan:"7"}).appendTo(rowbottom).append('&nbsp;');
 
         }})
+    },
+
+    converter: function(value,type) {
+        switch(type) {
+            case 'number':
+                return Utils.tornNumber(value);
+            break;
+            case 'currency':
+                return '$' + Utils.tornNumber(value);
+            break;
+            case 'percent':
+                return Utils.tornNumber(value,2) + "%";
+            break;
+            case 'time':
+                return Utils.secsToTime(value);
+            break;
+            default:
+                return value;
+            break;
+        }
     }
 
 

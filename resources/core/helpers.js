@@ -1,6 +1,55 @@
 
 /* Utils contains general Javascript functions usable several places */
 Utils = {
+    secsToTime: function(value, format) {
+        format = format || '{d} days {hh}:{mm}:{ss}';
+        var regex = /{((.)(\2)*)}/g;
+        var formats = [], values = {};
+        var result, temp;
+        var seconds = value;
+
+        var nums = {
+            d: 86400,
+            h: 3600,
+            m: 60,
+            s: 1
+        }
+
+        while(result = regex.exec(format)) {
+            formats.push(result[2]);
+        }
+
+        for(var fI in formats) {
+            var fm = formats[fI];
+            temp = seconds % nums[fm];
+            values[fm] = (seconds - temp) / nums[fm];
+            seconds = temp;
+        }
+        return Utils.formatObject(format,values);
+    },
+    formatObject: function(format, object) {
+        return format.replace(/{((.)(\2)*)}/g, function(match, lengthvalue, matchvalue) {
+            return typeof object[matchvalue] != 'undefined'
+                ? Utils.padLeft(object[matchvalue],lengthvalue.length)
+                : match;
+        });
+    },
+    formatArray: function(format, values) {
+        return format.replace(/{(\d+)}/g, function(match, number) {
+            return typeof values[number] != 'undefined'
+                ? values[number]
+                : match;
+        });
+    },
+    format: function(format /*, ...args*/) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return Utils.formatArray(format,args);
+    },
+    padLeft: function(num, width, pad) {
+        pad = pad || '0';
+        num = num + '';
+        return num.length >= width ? num : new Array(width - num.length + 1).join(pad) + num;
+    },
     number: function(str) {
         var m;
         if(str == undefined) return undefined;
