@@ -9,6 +9,7 @@
         }
         else if(Script.Dev.getDebugMode() && !this.enablelocaldev)
         {
+            
             //Disable Debug mode
             Script.Dev.setDebugMode(false);
         }
